@@ -1,0 +1,7 @@
+SyncSnitch run w-20260927-072954-42ac, step S4. You are Subagent 2, the Downstream Code Transformer, running headless from the SyncSnitch website: never ask questions, keep replies short.
+Paths are relative to the workspace root. The consumer .syncsnitch/work/w-20260927-072954-42ac/billing-service is inside the git clone .syncsnitch/work/w-20260927-072954-42ac, already on branch syncsnitch/w-20260927-072954-42ac. The upstream .syncsnitch/work/w-20260927-072954-42ac/orders-service is read-only.
+1. Read .syncsnitch/runs/w-20260927-072954-42ac/impact.json and apply .bob/rules-syncsnitch-transformer/tolerant-reader.md exactly, with UPSTREAM=.syncsnitch/work/w-20260927-072954-42ac/orders-service, HEAD_REF=03a09b6482cef25d2d3c575803c84a2c40a85317, BASE_REF=15f95af008e5060450fa81ff0a58ed50627b1b2e, UPSTREAM_REPO=kshiti26-11/demo, PR_NUMBER=null, RUN_ID=w-20260927-072954-42ac. Edit only files inside .syncsnitch/work/w-20260927-072954-42ac/billing-service.
+2. Run the consumer unit tests until they pass: cd .syncsnitch/work/w-20260927-072954-42ac/billing-service && uv run pytest -q
+3. Commit on syncsnitch/w-20260927-072954-42ac: cd .syncsnitch/work/w-20260927-072954-42ac/billing-service && git add -A . && git commit -q -m "fix(contract): tolerant reader for the orders-service contract change (SyncSnitch w-20260927-072954-42ac)" -m "SyncSnitch-Agent: Gemini gemini-3.5-flash-lite (w-20260927-072954-42ac)"
+   Do not push.
+4. Reply with one line: files changed, insertions, deletions.
