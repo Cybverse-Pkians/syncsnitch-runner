@@ -1,0 +1,292 @@
+{
+  "run_id": "w-20260927-103603-c9e0",
+  "mapping": [
+    {
+      "change_ids": ["rest:OrderStatus.PENDING:enum_value_removed"],
+      "old": "PENDING",
+      "new": "None",
+      "rule": "enum_value_removed"
+    },
+    {
+      "change_ids": ["rest:Order.customer_name:property_removed"],
+      "old": "customer_name",
+      "new": "None",
+      "rule": "property_removed"
+    },
+    {
+      "change_ids": ["rest:Order.total_price:property_removed"],
+      "old": "total_price",
+      "new": "None",
+      "rule": "property_removed"
+    },
+    {
+      "change_ids": ["grpc:orders.OrderStatus.1:enum_value_renamed"],
+      "old": "ORDER_STATUS_PENDING",
+      "new": "ORDER_STATUS_AWAITING_PAYMENT",
+      "rule": "enum_value_renamed"
+    },
+    {
+      "change_ids": ["grpc:orders.OrderSummary.2:field_removed"],
+      "old": "customer_name",
+      "new": "None",
+      "rule": "field_removed"
+    },
+    {
+      "change_ids": ["grpc:orders.OrderSummary.3:field_removed"],
+      "old": "total_price",
+      "new": "None",
+      "rule": "field_removed"
+    },
+    {
+      "change_ids": ["db:orders.customer_name:column_renamed"],
+      "old": "customer_name",
+      "new": "customer_display_name",
+      "rule": "column_renamed"
+    },
+    {
+      "change_ids": ["db:orders.status.PENDING:value_renamed"],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "value_renamed"
+    },
+    {
+      "change_ids": ["db:orders.total_price:column_dropped"],
+      "old": "total_price",
+      "new": "None",
+      "rule": "column_dropped"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "customer_name",
+      "change_ids": ["rest:Order.customer_name:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name when present, else customer_name."
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "total_price",
+      "change_ids": ["rest:Order.total_price:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else round(total_price * 100)."
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "total_price",
+      "change_ids": ["db:orders.total_price:column_dropped"],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Check alembic_version.version_num. Use SUM(total_price) for 0001 and SUM(total_minor) for 0002."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "PENDING",
+      "change_ids": ["rest:OrderStatus.PENDING:enum_value_removed"],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Treat both PENDING and AWAITING_PAYMENT as 'not payable'."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "total_price",
+      "change_ids": ["rest:Order.total_price:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else round(total_price * 100)."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "total_price",
+      "change_ids": ["rest:Order.total_price:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else round(total_price * 100)."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "customer_name",
+      "change_ids": ["rest:Order.customer_name:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name when present, else customer_name."
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "total_price",
+      "change_ids": ["grpc:orders.OrderSummary.3:field_removed"],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Vendor the v2 proto but re-declare fields 2 and 3 as deprecated in your copy, check HasField('total')."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "ORDER_STATUS_PENDING",
+      "change_ids": ["grpc:orders.OrderStatus.1:enum_value_renamed"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Vendor the v2 proto with ORDER_STATUS_AWAITING_PAYMENT."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "customer_name",
+      "change_ids": ["grpc:orders.OrderSummary.2:field_removed"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Vendor the v2 proto with customer field."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "total_price",
+      "change_ids": ["grpc:orders.OrderSummary.3:field_removed"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Vendor the v2 proto with total field."
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 3,
+      "symbol": "customer_name",
+      "change_ids": ["rest:Order.customer_name:property_removed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture to have customer display_name structure."
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 4,
+      "symbol": "total_price",
+      "change_ids": ["rest:Order.total_price:property_removed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture to have total amount_minor structure."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 3,
+      "symbol": "customer_name",
+      "change_ids": ["rest:Order.customer_name:property_removed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture to have customer display_name structure."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 4,
+      "symbol": "total_price",
+      "change_ids": ["rest:Order.total_price:property_removed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture to have total amount_minor structure."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 5,
+      "symbol": "PENDING",
+      "change_ids": ["rest:OrderStatus.PENDING:enum_value_removed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update status value to AWAITING_PAYMENT in test fixture."
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 10,
+      "symbol": "customer_name",
+      "change_ids": ["grpc:orders.OrderSummary.2:field_removed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Mock gRPC field customer display_name instead of customer_name."
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 11,
+      "symbol": "total_price",
+      "change_ids": ["grpc:orders.OrderSummary.3:field_removed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Mock gRPC field total amount_minor instead of total_price."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 11,
+      "symbol": "PENDING",
+      "change_ids": ["db:orders.status.PENDING:value_renamed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test assert or seed data to use AWAITING_PAYMENT."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "customer_name",
+      "change_ids": ["db:orders.customer_name:column_renamed"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test db schema or test sql assertion."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "total_price",
+      "change_ids": ["db:orders.total_price:column_dropped"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test db schema or test sql assertion."
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Parsing the updated REST payload raises a Pydantic ValidationError in OrderDTO because customer_name and total_price are no longer present. Additionally, treating PENDING as 'not payable' fails silently since AWAITING_PAYMENT is now used."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "Accessing 'summary.total_price' from the gRPC OrderSummary message silently defaults to 0.0 under the new schema, as the field has been removed, returning an incorrect minor amount."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "The database column 'total_price' has been dropped from the 'orders' table, causing the SELECT query in revenue.sql to throw a column-not-found database error."
+    }
+  ],
+  "migration_notes": "Orders v2 introduces breaking contract changes to money, customer, and status representations across REST, gRPC, and DB. To ensure backward compatibility during rollout, the migration guidance recommends consumers implement tolerant readers that support both v1 and v2. For REST, consumers should read 'total.amount_minor' and 'customer.display_name' if available, defaulting to their v1 counterparts. For gRPC, clients should vendor the v2 proto but mark deprecated fields as 'deprecated = true' in their local copies. For DB/SQL, reports should check the 'alembic_version' to use 'total_price' for 0001 and 'total_minor' for 0002."
+}
