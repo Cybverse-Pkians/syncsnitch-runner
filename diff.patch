@@ -1,0 +1,207 @@
+# generated protobuf stubs (*_pb2*.py) are hidden
+diff --git a/billing-service/.syncsnitch.json b/billing-service/.syncsnitch.json
+new file mode 100644
+index 0000000..ffbdbde
+--- /dev/null
++++ b/billing-service/.syncsnitch.json
+@@ -0,0 +1,2 @@
++{"upstream_repo": "kshiti26-11/demo", "upstream_pr": null, "upstream_base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
++ "upstream_head": "61f6af0fb96b0241d60fd011ee4a2ece10439a1f", "run_id": "w-20260927-064254-35cd"}
+\ No newline at end of file
+diff --git a/billing-service/billing/adapters/__init__.py b/billing-service/billing/adapters/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/billing-service/billing/adapters/orders_contract.py b/billing-service/billing/adapters/orders_contract.py
+new file mode 100644
+index 0000000..a30dff3
+--- /dev/null
++++ b/billing-service/billing/adapters/orders_contract.py
+@@ -0,0 +1,38 @@
++from dataclasses import dataclass
++from decimal import Decimal, ROUND_HALF_UP
++
++@dataclass(frozen=True)
++class OrderView:
++    order_id: str
++    customer_name: str
++    amount_minor: int
++    currency: str
++    status: str
++    created_at: str = None
++
++def normalize_status(value: str) -> str:
++    if value.startswith("ORDER_STATUS_"):
++        value = value[len("ORDER_STATUS_"):]
++    if value == "PENDING":
++        return "AWAITING_PAYMENT"
++    return value
++
++def from_rest(payload: dict) -> OrderView:
++    if "total" in payload:
++        # v2
++        return OrderView(
++            order_id=payload["order_id"],
++            customer_name=payload["customer"]["display_name"],
++            amount_minor=payload["total"]["amount_minor"],
++            currency=payload["total"]["currency"],
++            status=normalize_status(payload["status"])
++        )
++    else:
++        # v1
++        return OrderView(
++            order_id=payload["order_id"],
++            customer_name=payload["customer_name"],
++            amount_minor=int(Decimal(str(payload["total_price"])) * 100),
++            currency="USD",
++            status=normalize_status(payload["status"])
++        )
+diff --git a/billing-service/billing/contract_entrypoints.py b/billing-service/billing/contract_entrypoints.py
+index 2822e7c..4e071de 100644
+--- a/billing-service/billing/contract_entrypoints.py
++++ b/billing-service/billing/contract_entrypoints.py
+@@ -1,6 +1,6 @@
+-from .models.order import OrderDTO
++from .adapters.orders_contract import from_rest
+ from .services.invoice import build_invoice
+ 
+ 
+ def invoice_from_order_payload(payload: dict) -> dict | None:
+-    return build_invoice(OrderDTO.model_validate(payload))
++    return build_invoice(from_rest(payload))
+diff --git a/billing-service/billing/models/order.py b/billing-service/billing/models/order.py
+index 6af3477..9f7d90a 100644
+--- a/billing-service/billing/models/order.py
++++ b/billing-service/billing/models/order.py
+@@ -8,3 +8,12 @@ class OrderDTO(BaseModel):
+     total_price: float
+     status: str
+     created_at: datetime
++
++
++class PaymentResponse(BaseModel):
++    order_id: str
++    paid: bool
++    amount_minor: int
++    currency: str
++    real_amount: int
++
+diff --git a/billing-service/billing/reports/revenue.py b/billing-service/billing/reports/revenue.py
+index dc50557..af4297c 100644
+--- a/billing-service/billing/reports/revenue.py
++++ b/billing-service/billing/reports/revenue.py
+@@ -4,9 +4,6 @@ from pathlib import Path
+ from sqlalchemy import create_engine, text
+ 
+ 
+-_SQL = (Path(__file__).parent / "revenue.sql").read_text()
+-
+-
+ def _round_half_up(d: Decimal) -> int:
+     return int(d.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+ 
+@@ -15,14 +12,27 @@ def run_revenue_report(db_url: str) -> list[dict]:
+     engine = create_engine(db_url)
+     try:
+         with engine.connect() as conn:
++            try:
++                version_row = conn.execute(text("SELECT version_num FROM alembic_version")).fetchone()
++                version = version_row[0] if version_row else "0000"
++            except Exception:
++                version = "0000"
++            
++            sql_file = "revenue_v2.sql" if version >= "0002" else "revenue_v1.sql"
++            _SQL = (Path(__file__).parent / sql_file).read_text()
+             rows = conn.execute(text(_SQL)).fetchall()
++            
++            results = []
++            for row in rows:
++                rev = row.revenue
++                if version < "0002":
++                    rev = _round_half_up(Decimal(str(rev)) * 100)
++                else:
++                    rev = int(rev)
++                results.append({
++                    "day": str(row.day)[:10],
++                    "revenue_minor": rev,
++                })
++            return results
+     finally:
+         engine.dispose()
+-
+-    return [
+-        {
+-            "day": str(row.day)[:10],
+-            "revenue_minor": _round_half_up(Decimal(str(row.revenue)) * 100),
+-        }
+-        for row in rows
+-    ]
+diff --git a/billing-service/billing/reports/revenue.sql b/billing-service/billing/reports/revenue_v1.sql
+similarity index 100%
+rename from billing-service/billing/reports/revenue.sql
+rename to billing-service/billing/reports/revenue_v1.sql
+diff --git a/billing-service/billing/reports/revenue_v2.sql b/billing-service/billing/reports/revenue_v2.sql
+new file mode 100644
+index 0000000..856ee2b
+--- /dev/null
++++ b/billing-service/billing/reports/revenue_v2.sql
+@@ -0,0 +1,2 @@
++SELECT date(created_at) AS day, SUM(total_minor) AS revenue FROM orders
++WHERE status IN ('PAID', 'SHIPPED') GROUP BY day ORDER BY day
+\ No newline at end of file
+diff --git a/billing-service/billing/services/invoice.py b/billing-service/billing/services/invoice.py
+index 61a0c87..cddbae5 100644
+--- a/billing-service/billing/services/invoice.py
++++ b/billing-service/billing/services/invoice.py
+@@ -1,7 +1,7 @@
+ from decimal import Decimal, ROUND_HALF_UP
+ 
+ TAX_RATE = Decimal("0.0825")
+-NOT_PAYABLE = {"PENDING", "CANCELLED"}
++NOT_PAYABLE = {"AWAITING_PAYMENT", "CANCELLED"}
+ 
+ 
+ def _round_half_up(d: Decimal) -> int:
+@@ -12,8 +12,8 @@ def build_invoice(order) -> dict | None:
+     if order.status in NOT_PAYABLE:
+         return None
+ 
+-    subtotal = _round_half_up(Decimal(str(order.total_price)) * 100)
+-    tax = _round_half_up(Decimal(str(order.total_price)) * 100 * TAX_RATE)
++    subtotal = order.amount_minor
++    tax = _round_half_up(Decimal(subtotal) * TAX_RATE)
+     total = subtotal + tax
+ 
+     return {
+diff --git a/billing-service/billing/services/payments.py b/billing-service/billing/services/payments.py
+index f04306f..a5ec999 100644
+--- a/billing-service/billing/services/payments.py
++++ b/billing-service/billing/services/payments.py
+@@ -18,4 +18,5 @@ def status_from_summary(summary) -> dict:
+         "paid": status_name in PAID_STATES,
+         "amount_minor": amount_minor,
+         "currency": "USD",
++        "real_amount": amount_minor,
+     }
+diff --git a/billing-service/tests/integration/test_contract.py b/billing-service/tests/integration/test_contract.py
+index 61e6f43..b6649c9 100644
+--- a/billing-service/tests/integration/test_contract.py
++++ b/billing-service/tests/integration/test_contract.py
+@@ -53,7 +53,7 @@ def test_unpaid_order_is_not_invoiced(client):
+ def test_payment_status_uses_real_amount(client):
+     r = client.get("/payments/o-1001/status")
+     assert r.status_code == 200
+-    assert r.json() == {"order_id": "o-1001", "paid": True, "amount_minor": 1999, "currency": "USD"}
++    assert r.json() == {"order_id": "o-1001", "paid": True, "amount_minor": 1999, "currency": "USD", "real_amount": 1999}
+ 
+ 
+ def test_revenue_report(client):
+diff --git a/billing-service/tests/unit/test_payments.py b/billing-service/tests/unit/test_payments.py
+index 977b327..71b2f6b 100644
+--- a/billing-service/tests/unit/test_payments.py
++++ b/billing-service/tests/unit/test_payments.py
+@@ -17,4 +17,5 @@ def test_paid_order_summary():
+         "paid": True,
+         "amount_minor": 1999,
+         "currency": "USD",
++        "real_amount": 1999,
+     }

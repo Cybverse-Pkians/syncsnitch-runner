@@ -1,0 +1,86 @@
+{
+  "run_id": "w-20260927-064254-35cd",
+  "mapping": [
+    {
+      "change_ids": ["rest:Order.total_price:property_removed", "grpc:orders.OrderSummary.3:field_removed", "db:orders.total_price:column_dropped"],
+      "old": "total_price",
+      "new": "total",
+      "rule": "Replace total_price with total.amount_minor"
+    },
+    {
+      "change_ids": ["rest:Order.customer_name:property_removed", "grpc:orders.OrderSummary.2:field_removed", "db:orders.customer_name:column_renamed"],
+      "old": "customer_name",
+      "new": "customer",
+      "rule": "Replace customer_name with customer.display_name"
+    },
+    {
+      "change_ids": ["rest:OrderStatus.PENDING:enum_value_removed", "db:orders.status.PENDING:value_renamed"],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "Treat both as 'not payable'"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "OrderDTO",
+      "change_ids": ["rest:Order.customer_name:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update model to use customer.display_name"
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "OrderDTO",
+      "change_ids": ["rest:Order.total_price:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update model to use total.amount_minor"
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "revenue.sql",
+      "change_ids": ["db:orders.total_price:column_dropped"],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Update query to use total_minor"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "NOT_PAYABLE",
+      "change_ids": ["rest:OrderStatus.PENDING:enum_value_removed"],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Include AWAITING_PAYMENT in check"
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Missing fields and status rename will break request handling"
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "SQL query references a dropped column"
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "rest",
+      "failure": "silent",
+      "why": "Uses total_price which is removed"
+    }
+  ],
+  "migration_notes": "The API v2 migration replaces floating-point money (total_price) with integer minor units (total.amount_minor) and restructures customer info. It also renames the status PENDING to AWAITING_PAYMENT. Consumers should deploy a tolerant reader that supports both v1 and v2 formats during the transition. Once deployed, cleanup PRs should remove v1 code paths."
+}
