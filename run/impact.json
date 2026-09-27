@@ -1,0 +1,306 @@
+{
+  "run_id": "w-20260927-091515-0f22",
+  "mapping": [
+    {
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "old": "total_price",
+      "new": "total (amount_minor, currency) / total_minor",
+      "rule": "Property / field / column removed or replaced with structured money object in minor units."
+    },
+    {
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "old": "customer_name",
+      "new": "customer (customer_id, display_name) / customer_display_name",
+      "rule": "Property / field removed or column renamed for structured customer identity."
+    },
+    {
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed",
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "old": "PENDING / ORDER_STATUS_PENDING",
+      "new": "AWAITING_PAYMENT / ORDER_STATUS_AWAITING_PAYMENT",
+      "rule": "Enum value / status string renamed from PENDING to AWAITING_PAYMENT."
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "OrderDTO",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update model to accept nested customer object or optional fallback."
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "OrderDTO",
+      "change_ids": [
+        "rest:Order.total_price:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update model to accept nested total object or optional fallback."
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "revenue.sql",
+      "change_ids": [
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Update query to use total_minor or version-conditional SQL."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "NOT_PAYABLE",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Include \"AWAITING_PAYMENT\" in NOT_PAYABLE set."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.total_price:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor with fallback to total_price."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.total_price:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor with fallback to total_price."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name with fallback to customer_name."
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "status_from_summary",
+      "change_ids": [
+        "grpc:orders.OrderSummary.3:field_removed"
+      ],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Vendor v2 proto and read total.amount_minor."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": null,
+      "fix": "Update proto definition to v2 enum names."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "grpc:orders.OrderSummary.2:field_removed"
+      ],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": null,
+      "fix": "Update proto definition to v2 fields."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "grpc:orders.OrderSummary.3:field_removed"
+      ],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": null,
+      "fix": "Update proto definition to v2 fields."
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 3,
+      "symbol": "order_paid.json",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture to v2 schema."
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 4,
+      "symbol": "order_paid.json",
+      "change_ids": [
+        "rest:Order.total_price:property_removed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture to v2 schema."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 3,
+      "symbol": "order_unpaid.json",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture to v2 schema."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 4,
+      "symbol": "order_unpaid.json",
+      "change_ids": [
+        "rest:Order.total_price:property_removed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture to v2 schema."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 5,
+      "symbol": "order_unpaid.json",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture status to AWAITING_PAYMENT."
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 10,
+      "symbol": "test_paid_order_summary",
+      "change_ids": [
+        "grpc:orders.OrderSummary.2:field_removed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test to use v2 gRPC message structure."
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 11,
+      "symbol": "test_paid_order_summary",
+      "change_ids": [
+        "grpc:orders.OrderSummary.3:field_removed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test to use v2 gRPC message structure."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 11,
+      "symbol": "ROWS",
+      "change_ids": [
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test data to use AWAITING_PAYMENT."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "db_url",
+      "change_ids": [
+        "db:orders.customer_name:column_renamed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test schema DDL to match v2 columns."
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Pydantic model validation fails when customer_name and total_price properties are missing from upstream REST payload, raising ValidationError resulting in HTTP 500."
+    },
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "silent",
+      "why": "PENDING status renamed to AWAITING_PAYMENT causes payability check (NOT_PAYABLE set) to miss unpaid orders, silently treating them as payable."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "Old gRPC stubs read removed field total_price as 0.0, causing amount_minor to be incorrectly reported as 0 without raising any error."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "SQL query referencing dropped total_price column raises a database operational error resulting in HTTP 500."
+    }
+  ],
+  "migration_notes": "Orders v2 changes how an order's money, customer and payment state are represented. The REST payload, the gRPC OrderSummary message and the orders table all change in the same release (PR \"Orders API v2\"). Float money caused rounding incidents. Money must be integer minor units plus an ISO 4217 currency. Consumers ship tolerant readers that accept v1 and v2 at the same time."
+}
