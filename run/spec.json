@@ -1,0 +1,76 @@
+{
+  "run_id": "w-20260927-133756-b2c1",
+  "link": "https://github.com/kshiti26-11/demo",
+  "repo": "kshiti26-11/demo",
+  "status": "traced",
+  "created_at": "2026-09-27T13:38:11+00:00",
+  "site_url": "https://demo-smoky-six-28.vercel.app",
+  "overrides": {
+    "upstream": "orders-service",
+    "consumer": "billing-service",
+    "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+    "head": "main"
+  },
+  "traced_at": "2026-09-27T13:38:14.043+00:00",
+  "upstream": "orders-service",
+  "consumer": "billing-service",
+  "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head": "main",
+  "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head_sha": "395c6214dd0162164b419e5db6d35869b884be79",
+  "default_branch": "main",
+  "summary": {
+    "total": 26,
+    "breaking": 9,
+    "by_surface": {
+      "rest": 3,
+      "grpc": 3,
+      "db": 3
+    },
+    "files": 9,
+    "endpoints": [
+      "GET /payments/{order_id}/status",
+      "GET /reports/revenue",
+      "POST /invoices/{order_id}"
+    ]
+  },
+  "hits": 21,
+  "bob_command": "/syncsnitch https://demo-smoky-six-28.vercel.app/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main&run=w-20260927-133756-b2c1",
+  "analyze_url": "/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main",
+  "runner": {
+    "state": "complete",
+    "problems": [],
+    "error": null,
+    "backend": "gemini",
+    "label": "Gemini",
+    "model": "gemini-3.5-flash-lite",
+    "unit": "tokens",
+    "budget": 3000000.0,
+    "docker": true,
+    "started_at": "2026-09-27T13:38:14+00:00",
+    "updated_at": "2026-09-27T13:57:50.366+00:00",
+    "agents": {
+      "tracer": "done",
+      "transformer": "done",
+      "verifier": "done"
+    },
+    "stages": {
+      "tracer": "done",
+      "transformer": "done",
+      "verify": "done",
+      "verifier": "done"
+    },
+    "spent": {
+      "tracer": 25250.0,
+      "transformer": 71292.0,
+      "verifier": 6341.0
+    },
+    "tasks": {
+      "tracer": "WRy5aptX9qXUyQ-14eW4AQ",
+      "transformer": "kxy5aq6qC-Ws_PUPpLb7iAY",
+      "verifier": "px25auGVA56a9MoP7q-JsQI"
+    },
+    "verdict": "green",
+    "companion_pr_url": "https://github.com/Kshiti26-11/Demo/pull/12"
+  }
+}

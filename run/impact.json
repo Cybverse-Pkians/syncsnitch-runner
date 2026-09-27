@@ -1,0 +1,256 @@
+{
+  "run_id": "w-20260927-133756-b2c1",
+  "mapping": [
+    {
+      "change_ids": ["CH1"],
+      "old": "total_price",
+      "new": "total",
+      "rule": "Property/field removed: total_price (major units decimal) replaced by total object (amount_minor, currency)"
+    },
+    {
+      "change_ids": ["CH2"],
+      "old": "customer_name",
+      "new": "customer",
+      "rule": "Property/field removed: customer_name replaced by customer object (customer_id, display_name)"
+    },
+    {
+      "change_ids": ["CH3"],
+      "old": "PENDING / ORDER_STATUS_PENDING",
+      "new": "AWAITING_PAYMENT / ORDER_STATUS_AWAITING_PAYMENT",
+      "rule": "Enum value renamed: PENDING -> AWAITING_PAYMENT"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Support both customer object (display_name) and legacy customer_name"
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Support both total object (amount_minor) and legacy total_price"
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Check alembic_version.version_num and use SUM(total_minor) for migration 0002 or SUM(total_price) for 0001"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Include AWAITING_PAYMENT alongside PENDING in NOT_PAYABLE set"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else fallback to total_price"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else fallback to total_price"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name when present, else fallback to customer_name"
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Prefer summary.total.amount_minor when HasField('total') is true"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "ORDER_STATUS_PENDING",
+      "change_ids": ["CH3"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Vendor v2 proto copy re-declaring deprecated enum value"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Vendor v2 proto copy with field 2 marked [deprecated = true]"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Vendor v2 proto copy with field 3 marked [deprecated = true]"
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 3,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test fixture"
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 4,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test fixture"
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 3,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test fixture"
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 4,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test fixture"
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 5,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test fixture status to AWAITING_PAYMENT"
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 10,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test mock data"
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 11,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test mock data"
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 11,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test status data"
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test schema setup"
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "loud",
+      "endpoint": null,
+      "fix": "Update test schema setup"
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "OrderDTO Pydantic model validation fails on missing customer_name and total_price fields; also NOT_PAYABLE set misses AWAITING_PAYMENT."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "Proto3 defaults removed total_price field to 0.0 without throwing an exception, causing status_from_summary to silently return amount_minor: 0."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "SQL query in revenue.sql attempts to SUM(total_price), which raises a database error after the total_price column is dropped in migration 0002."
+    }
+  ],
+  "migration_notes": "Consumers ship tolerant readers that accept v1 and v2 at the same time. REST: read total.amount_minor when present, else round(total_price * 100); read customer.display_name when present, else customer_name; treat both PENDING and AWAITING_PAYMENT as 'not payable'. gRPC: vendor the v2 proto but re-declare fields 2 and 3 as [deprecated = true] in your copy, so one set of stubs can read both server versions; prefer total / customer when HasField(...) is true. SQL: check alembic_version.version_num; use SUM(total_price) for 0001 and SUM(total_minor) for 0002. Keep your own public API unchanged."
+}
