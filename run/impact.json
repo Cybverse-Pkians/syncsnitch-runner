@@ -1,0 +1,197 @@
+{
+  "run_id": "w-20260927-104500-b3ba",
+  "mapping": [
+    {
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "old": "total_price",
+      "new": "total_minor / currency",
+      "rule": "Property or column removed/renamed"
+    },
+    {
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "old": "customer_name",
+      "new": "customer_id / customer_display_name",
+      "rule": "Property or column removed/renamed"
+    },
+    {
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed",
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "Enum value renamed or removed"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name or fallback to customer_name"
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor or fallback to total_price"
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "total_price",
+      "change_ids": [
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Use SUM(total_minor) for version 0002 schema"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "PENDING",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed"
+      ],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Include AWAITING_PAYMENT in NOT_PAYABLE states"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Support total.amount_minor / 100"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Support total.amount_minor / 100"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Support customer.display_name"
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "total_price",
+      "change_ids": [
+        "grpc:orders.OrderSummary.3:field_removed"
+      ],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Use total.amount_minor with fallback for deprecated field 3"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Pydantic validation fails due to missing customer_name and total_price fields, and PENDING status change silently alters payable checks."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "Removed gRPC field 3 reads as 0.0, causing amount_minor to evaluate to 0 silently without throwing an error."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "Database query fails due to dropped total_price column."
+    }
+  ],
+  "migration_notes": "Orders v2 replaces float money with integer minor units plus currency, moves customer info into a structured object, and renames PENDING to AWAITING_PAYMENT. Consumers must ship tolerant readers that accept both v1 and v2 simultaneously during the rollout phase. Old REST clients fail on missing total_price, whereas old gRPC clients read removed fields as 0.0 silently. SQL reports must handle migration 0002 by querying total_minor instead of total_price."
+}

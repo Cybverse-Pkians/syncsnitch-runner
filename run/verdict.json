@@ -1,0 +1,13 @@
+{
+  "run_id": "w-20260927-104500-b3ba",
+  "verdict": "red",
+  "reasons": [
+    "Check V4 failed: tests.integration.test_contract::test_invoice_paid_order and test_rest_contract_examples_parse failed against upstream v2 because billing fields such as tax_minor, total_minor, customer, and subtotal_minor returned 0/Unknown.",
+    "Check V5 failed: Prism contract examples did not parse correctly due to mismatch in upstream v2 fields.",
+    "Scanner hit in billing/reports/revenue.sql:1 (total_price) needs adjustment to support both v1 and v2."
+  ],
+  "fix_instructions": [
+    "Update billing-service adapter / mapping under .syncsnitch/work/w-20260927-104500-b3ba/billing-service to correctly map v2 invoice paid order and rest contract fields (tax_minor, total_minor, customer, subtotal_minor) instead of yielding zero or default values.",
+    "Update billing/reports/revenue.sql to handle total_price compatibly with both v1 and v2 upstream contracts."
+  ]
+}

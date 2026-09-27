@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="5" time="1.050" timestamp="2026-09-27T10:48:21.102725+00:00" hostname="746a74694a13"><testcase classname="tests.integration.test_contract" name="test_invoice_paid_order" time="0.169"><failure message="AssertionError: assert {'order_id': ...inor': 0, ...} == {'order_id': ...or': 165, ...}&#10;  &#10;  Omitting 2 identical items, use -vv to show&#10;  Differing items:&#10;  {'tax_minor': 0} != {'tax_minor': 165}&#10;  {'total_minor': 0} != {'total_minor': 2164}&#10;  {'customer': 'Unknown'} != {'customer': 'Ada Lovelace'}&#10;  {'subtotal_minor': 0} != {'subtotal_minor': 1999}&#10;  Use -v to get more diff">client = &lt;starlette.testclient.TestClient object at 0x7f2f6592aa50&gt;
+
+    def test_invoice_paid_order(client):
+        r = client.post("/invoices/o-1001")
+        assert r.status_code == 201
+&gt;       assert r.json() == {"order_id": "o-1001", "customer": "Ada Lovelace", "subtotal_minor": 1999,
+                            "tax_minor": 165, "total_minor": 2164, "currency": "USD"}
+E       AssertionError: assert {'order_id': ...inor': 0, ...} == {'order_id': ...or': 165, ...}
+E         
+E         Omitting 2 identical items, use -vv to show
+E         Differing items:
+E         {'tax_minor': 0} != {'tax_minor': 165}
+E         {'total_minor': 0} != {'total_minor': 2164}
+E         {'customer': 'Unknown'} != {'customer': 'Ada Lovelace'}
+E         {'subtotal_minor': 0} != {'subtotal_minor': 1999}
+E         Use -v to get more diff
+
+tests/integration/test_contract.py:44: AssertionError</failure></testcase><testcase classname="tests.integration.test_contract" name="test_unpaid_order_is_not_invoiced" time="0.020" /><testcase classname="tests.integration.test_contract" name="test_payment_status_uses_real_amount" time="0.076" /><testcase classname="tests.integration.test_contract" name="test_revenue_report" time="0.133" /><testcase classname="tests.integration.test_contract" name="test_rest_contract_examples_parse" time="0.062"><failure message="assert 0 == 2164">def test_rest_contract_examples_parse():
+        paid = httpx.get(f"{MOCK}/orders/o-1001", headers={"Prefer": "example=paid"}, timeout=10).json()
+        unpaid = httpx.get(f"{MOCK}/orders/o-1002", headers={"Prefer": "example=unpaid"}, timeout=10).json()
+&gt;       assert invoice_from_order_payload(paid)["total_minor"] == 2164
+E       assert 0 == 2164
+
+tests/integration/test_contract.py:68: AssertionError</failure></testcase></testsuite></testsuites>

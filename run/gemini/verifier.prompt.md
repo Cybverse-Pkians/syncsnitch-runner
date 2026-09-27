@@ -1,0 +1,11 @@
+SyncSnitch run w-20260927-104500-b3ba, step S6. You are Subagent 3, the Contract Verifier, running headless from the SyncSnitch website: never ask questions, never edit code, keep replies short.
+Read .syncsnitch/runs/w-20260927-104500-b3ba/verification.json: the deterministic checks V1-V6 of the Transformer's branch syncsnitch/w-20260927-104500-b3ba.
+Write .syncsnitch/runs/w-20260927-104500-b3ba/verdict.json:
+{"run_id": "w-20260927-104500-b3ba", "verdict": "green|red", "reasons": ["..."], "fix_instructions": ["..."]}
+Rules: the checks are the only truth. Any check with status "fail" makes the verdict red and needs precise, file-level fix_instructions for the Transformer (read .syncsnitch/runs/w-20260927-104500-b3ba/VERIFICATION.md and the failing consumer files under .syncsnitch/work/w-20260927-104500-b3ba/billing-service only if you need them). "skip" is not a failure, but name every skipped check in reasons. Green has an empty fix_instructions list.
+Facts the runner checked (base the fix_instructions on them):
+- Failing contract test V4 tests.integration.test_contract::test_invoice_paid_order against upstream v2: AssertionError: assert {'order_id': ...inor': 0, ...} == {'order_id': ...or': 165, ...} Omitting 2 identical items, use -vv to show Differing items: {'tax_minor': 0} != {'tax_minor': 165} {'total_minor': 0} != {'total_minor': 2164} {'customer': 'Unknown'} != {'customer': 'Ada Lovelace'} {'subtotal_minor': 0} != {'subtotal_minor': 1999} Use -v to get more diff
+- Failing contract test V4 tests.integration.test_contract::test_rest_contract_examples_parse against upstream v2: assert 0 == 2164
+- Scanner hits in files the branch has not changed yet (each must still work with v1 and v2): billing/reports/revenue.sql:1 (total_price)
+- The tests in tests/integration/ are the contract spec: fix the consumer code under .syncsnitch/work/w-20260927-104500-b3ba/billing-service, never the test, and never add or rename a field in a billing response. An actual value of 0 or empty usually means the consumer still reads a field the new upstream removed; read the new fields through the adapter where that value is built.
+Reply with one line: the verdict and the first reason.
