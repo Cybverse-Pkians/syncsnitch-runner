@@ -1,0 +1,12 @@
+# SyncSnitch Verification — w-20260927-081056-c66c
+
+**Verdict:** ❌ RED
+
+| Check | Name | Result | Details |
+|---|---|---|---|
+| `V1` | consumer unit tests | ✅ pass | 10 passed, 1 skipped, 1 warning in 0.51s |
+| `V2` | v2 fixtures match the new contract | ✅ pass | 3 v2 fixtures match schema |
+| `V3` | consumer vs upstream v1 (backward compatible) | ❌ fail | 4/5 passed (failures: test_payment_status_uses_real_amount) |
+| `V4` | consumer vs upstream v2 (new contract) | ❌ fail | 4/5 passed (failures: test_payment_status_uses_real_amount) |
+| `V5` | Prism contract examples | ✅ pass | test_rest_contract_examples_parse passed against v1 and v2 |
+| `V6` | diff scope | ✅ pass | 16 files changed within scope |

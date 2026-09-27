@@ -1,0 +1,12 @@
+{
+  "run_id": "w-20260927-081056-c66c",
+  "verdict": "red",
+  "reasons": [
+    "V3 consumer vs upstream v1 failed: test_payment_status_uses_real_amount",
+    "V4 consumer vs upstream v2 failed: test_payment_status_uses_real_amount",
+    "V1, V2, V5, V6 passed."
+  ],
+  "fix_instructions": [
+    "In .syncsnitch/work/w-20260927-081056-c66c/billing-service/billing/services/payments.py, update is_paid determination in status_from_summary to also recognize new upstream status values (such as 'ORDER_STATUS_PAID', 'ORDER_STATUS_SHIPPED', or normalize via normalize_status(view.status)) so that 'paid' evaluates to True when appropriate."
+  ]
+}

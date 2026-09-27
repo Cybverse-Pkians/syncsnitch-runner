@@ -1,0 +1,212 @@
+{
+  "run_id": "w-20260927-081056-c66c",
+  "mapping": [
+    {
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "old": "customer_name",
+      "new": "customer { customer_id, display_name }",
+      "rule": "Customer identity is now structured into an object containing customer_id and display_name instead of a single string field."
+    },
+    {
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "old": "total_price",
+      "new": "total { amount_minor, currency }",
+      "rule": "Money is now represented in integer minor units with currency rather than a decimal major units float."
+    },
+    {
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed",
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "Order status PENDING was renamed to AWAITING_PAYMENT for clarity across teams."
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "OrderDTO",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update model to expect the nested customer object with display_name."
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "OrderDTO",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update model to expect the nested total object with amount_minor."
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "revenue.sql",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Update SQL report to use total_minor from the orders table."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "NOT_PAYABLE",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Check for both PENDING and AWAITING_PAYMENT in invoice generation logic."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Access total.amount_minor instead of total_price."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Access total.amount_minor instead of total_price."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Access customer.display_name instead of customer_name."
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "status_from_summary",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Access total.amount_minor instead of total_price."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "silent",
+      "why": "Missing fields raise attribute errors or fail model parsing (loud), but status value renaming causes unpaid orders to be incorrectly treated as payable without raising an exception (silent)."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "SQL query references the dropped total_price column, causing a database query execution error."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Code attempts to access total_price on the order response, which is removed and raises an attribute error."
+    }
+  ],
+  "migration_notes": "Orders v2 changes how an order's money, customer and payment state are represented. The REST payload, the gRPC OrderSummary message and the orders table all change in the same release. Float money caused rounding incidents, so money must be integer minor units plus an ISO 4217 currency. Consumers need a stable customer_id, not only a display name, and PENDING was renamed to AWAITING_PAYMENT. Consumers ship tolerant readers that accept v1 and v2 at the same time, and after one week, remove the v1 code paths."
+}

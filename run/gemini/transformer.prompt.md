@@ -1,0 +1,15 @@
+SyncSnitch run w-20260927-081056-c66c, step S4 fix round. You are Subagent 2, the Downstream Code Transformer, running headless from the SyncSnitch website: never ask questions, keep replies short.
+Paths are relative to the workspace root. The consumer .syncsnitch/work/w-20260927-081056-c66c/billing-service is inside the git clone .syncsnitch/work/w-20260927-081056-c66c, on branch syncsnitch/w-20260927-081056-c66c. The upstream .syncsnitch/work/w-20260927-081056-c66c/orders-service is read-only. The rules in .bob/rules-syncsnitch-transformer/tolerant-reader.md still apply.
+The Contract Verifier found these failing checks:
+- V3 consumer vs upstream v1 (backward compatible): 4/5 passed (failures: test_payment_status_uses_real_amount)
+- V4 consumer vs upstream v2 (new contract): 4/5 passed (failures: test_payment_status_uses_real_amount)
+Apply these fix instructions, editing only files inside .syncsnitch/work/w-20260927-081056-c66c/billing-service:
+- Update billing/reports/revenue.sql to replace total_price with the correct upstream field name.
+- Update consumer code under .syncsnitch/work/w-20260927-081056-c66c/billing-service where payment status is computed/mapped so that paid correctly resolves to True instead of False.
+Facts the runner checked; they win over any instruction above (skip an instruction that edits tests/integration/ or changes a billing response):
+- Failing contract test V3 tests.integration.test_contract::test_payment_status_uses_real_amount against upstream v1: AssertionError: assert {'order_id': ...rency': 'USD'} == {'order_id': ...rency': 'USD'} Omitting 3 identical items, use -vv to show Differing items: {'paid': False} != {'paid': True} Use -v to get more diff
+- Failing contract test V4 tests.integration.test_contract::test_payment_status_uses_real_amount against upstream v2: AssertionError: assert {'order_id': ...rency': 'USD'} == {'order_id': ...rency': 'USD'} Omitting 3 identical items, use -vv to show Differing items: {'paid': False} != {'paid': True} Use -v to get more diff
+- Scanner hits in files the branch has not changed yet (each must still work with v1 and v2): billing/reports/revenue.sql:1 (total_price)
+- The tests in tests/integration/ are the contract spec: fix the consumer code under .syncsnitch/work/w-20260927-081056-c66c/billing-service, never the test, and never add or rename a field in a billing response. An actual value of 0 or empty usually means the consumer still reads a field the new upstream removed; read the new fields through the adapter where that value is built.
+Then run cd .syncsnitch/work/w-20260927-081056-c66c/billing-service && uv run pytest -q until green, and commit on syncsnitch/w-20260927-081056-c66c: cd .syncsnitch/work/w-20260927-081056-c66c/billing-service && git add -A . && git commit -q -m "fix(contract): address the Contract Verifier findings (SyncSnitch w-20260927-081056-c66c)" -m "SyncSnitch-Agent: Gemini gemini-3.5-flash-lite (w-20260927-081056-c66c)"
+Do not push. Reply with one line.
