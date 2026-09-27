@@ -1,0 +1,12 @@
+# SyncSnitch Verification — w-20260927-132946-cdba
+
+**Verdict:** ✅ GREEN
+
+| Check | Name | Result | Details |
+|---|---|---|---|
+| `V1` | consumer unit tests | ✅ pass | 8 passed, 1 skipped, 1 warning in 0.47s |
+| `V2` | v2 fixtures match the new contract | ✅ pass | 3 v2 fixtures match schema |
+| `V3` | consumer vs upstream v1 (backward compatible) | ✅ pass | 5/5 passed |
+| `V4` | consumer vs upstream v2 (new contract) | ✅ pass | 5/5 passed |
+| `V5` | Prism contract examples | ✅ pass | test_rest_contract_examples_parse passed against v1 and v2 |
+| `V6` | diff scope | ✅ pass | 15 files changed within scope |

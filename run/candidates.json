@@ -1,0 +1,320 @@
+{
+  "run_id": "w-20260927-132946-cdba",
+  "consumer": "billing-service",
+  "hits": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "token": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "usage_kind": "model_field",
+      "symbol": "OrderDTO",
+      "endpoints": [
+        "POST /invoices/{order_id}"
+      ],
+      "in_tests": false
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "model_field",
+      "symbol": "OrderDTO",
+      "endpoints": [
+        "POST /invoices/{order_id}"
+      ],
+      "in_tests": false
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "sql_column",
+      "symbol": "revenue.sql",
+      "endpoints": [
+        "GET /reports/revenue"
+      ],
+      "in_tests": false
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "token": "PENDING",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "usage_kind": "literal",
+      "symbol": "NOT_PAYABLE",
+      "endpoints": [
+        "POST /invoices/{order_id}"
+      ],
+      "in_tests": false
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "attribute",
+      "symbol": "build_invoice",
+      "endpoints": [
+        "POST /invoices/{order_id}"
+      ],
+      "in_tests": false
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "attribute",
+      "symbol": "build_invoice",
+      "endpoints": [
+        "POST /invoices/{order_id}"
+      ],
+      "in_tests": false
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "token": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "usage_kind": "attribute",
+      "symbol": "build_invoice",
+      "endpoints": [
+        "POST /invoices/{order_id}"
+      ],
+      "in_tests": false
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "attribute",
+      "symbol": "status_from_summary",
+      "endpoints": [
+        "GET /payments/{order_id}/status"
+      ],
+      "in_tests": false
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "token": "ORDER_STATUS_PENDING",
+      "change_ids": [
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "usage_kind": "proto_field",
+      "symbol": "orders.proto",
+      "endpoints": [],
+      "in_tests": false
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "token": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "usage_kind": "proto_field",
+      "symbol": "orders.proto",
+      "endpoints": [],
+      "in_tests": false
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "proto_field",
+      "symbol": "orders.proto",
+      "endpoints": [],
+      "in_tests": false
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 3,
+      "token": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "usage_kind": "fixture",
+      "symbol": "order_paid.json",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 4,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "fixture",
+      "symbol": "order_paid.json",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 3,
+      "token": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "usage_kind": "fixture",
+      "symbol": "order_unpaid.json",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 4,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "fixture",
+      "symbol": "order_unpaid.json",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 5,
+      "token": "PENDING",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "usage_kind": "fixture",
+      "symbol": "order_unpaid.json",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 10,
+      "token": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "usage_kind": "keyword",
+      "symbol": "test_paid_order_summary",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 11,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "keyword",
+      "symbol": "test_paid_order_summary",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 11,
+      "token": "PENDING",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "usage_kind": "literal",
+      "symbol": "ROWS",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "token": "customer_name",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "usage_kind": "embedded_text",
+      "symbol": "db_url",
+      "endpoints": [],
+      "in_tests": true
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "token": "total_price",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "usage_kind": "embedded_text",
+      "symbol": "db_url",
+      "endpoints": [],
+      "in_tests": true
+    }
+  ],
+  "summary": {
+    "hits": 21,
+    "files": 9,
+    "endpoints": [
+      "GET /payments/{order_id}/status",
+      "GET /reports/revenue",
+      "POST /invoices/{order_id}"
+    ]
+  }
+}
