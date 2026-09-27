@@ -1,0 +1,52 @@
+{
+  "run_id": "w-20260927-063615-d1f5",
+  "consumer_sha": "dd67da0b99b17d6123b5f8a9f3b0099013f5f2ea",
+  "upstream": {
+    "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+    "head_sha": "61f6af0fb96b0241d60fd011ee4a2ece10439a1f"
+  },
+  "checks": [
+    {
+      "id": "V1",
+      "name": "consumer unit tests",
+      "status": "pass",
+      "details": "8 passed, 1 skipped, 1 warning in 0.55s"
+    },
+    {
+      "id": "V2",
+      "name": "v2 fixtures match the new contract",
+      "status": "pass",
+      "details": "1 v2 fixtures match schema"
+    },
+    {
+      "id": "V3",
+      "name": "consumer vs upstream v1 (backward compatible)",
+      "status": "pass",
+      "details": "5/5 passed"
+    },
+    {
+      "id": "V4",
+      "name": "consumer vs upstream v2 (new contract)",
+      "status": "fail",
+      "details": "1/5 passed (failures: test_invoice_paid_order, test_unpaid_order_is_not_invoiced, test_payment_status_uses_real_amount, test_rest_contract_examples_parse)"
+    },
+    {
+      "id": "V5",
+      "name": "Prism contract examples",
+      "status": "fail",
+      "details": "test_rest_contract_examples_parse not passed in both runs"
+    },
+    {
+      "id": "V6",
+      "name": "diff scope",
+      "status": "pass",
+      "details": "5 files changed within scope"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 2,
+    "skipped": 0,
+    "verdict": "red"
+  }
+}

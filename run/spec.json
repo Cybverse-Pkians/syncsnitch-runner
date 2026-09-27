@@ -1,0 +1,76 @@
+{
+  "run_id": "w-20260927-063615-d1f5",
+  "link": "https://github.com/kshiti26-11/demo",
+  "repo": "kshiti26-11/demo",
+  "status": "traced",
+  "created_at": "2026-09-27T06:36:31+00:00",
+  "site_url": "https://demo-kshiti26-11.vercel.app",
+  "overrides": {
+    "upstream": "orders-service",
+    "consumer": "billing-service",
+    "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+    "head": "main"
+  },
+  "traced_at": "2026-09-27T06:36:40.866+00:00",
+  "upstream": "orders-service",
+  "consumer": "billing-service",
+  "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head": "main",
+  "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head_sha": "61f6af0fb96b0241d60fd011ee4a2ece10439a1f",
+  "default_branch": "main",
+  "summary": {
+    "total": 26,
+    "breaking": 9,
+    "by_surface": {
+      "rest": 3,
+      "grpc": 3,
+      "db": 3
+    },
+    "files": 9,
+    "endpoints": [
+      "GET /payments/{order_id}/status",
+      "GET /reports/revenue",
+      "POST /invoices/{order_id}"
+    ]
+  },
+  "hits": 21,
+  "bob_command": "/syncsnitch https://demo-kshiti26-11.vercel.app/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main&run=w-20260927-063615-d1f5",
+  "analyze_url": "/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main",
+  "runner": {
+    "state": "rejected",
+    "problems": [],
+    "error": null,
+    "backend": "gemini",
+    "label": "Gemini",
+    "model": "gemini-3.1-flash-lite",
+    "unit": "tokens",
+    "budget": 3000000.0,
+    "docker": true,
+    "started_at": "2026-09-27T06:36:41+00:00",
+    "updated_at": "2026-09-27T06:41:49.796+00:00",
+    "agents": {
+      "tracer": "done",
+      "transformer": "done",
+      "verifier": "done"
+    },
+    "stages": {
+      "tracer": "done",
+      "transformer": "done",
+      "verify": "done",
+      "verifier": "done"
+    },
+    "spent": {
+      "tracer": 72215.0,
+      "transformer": 114368.0,
+      "verifier": 15888.0
+    },
+    "tasks": {
+      "tracer": "erm4apTAGuyP39IP76btyQ0",
+      "transformer": "4bm4apChA7GS39IP6s-HwQw",
+      "verifier": "Hbq4avmlOsfQz7IPmpmP2QM"
+    },
+    "verdict": "red",
+    "round": 1
+  }
+}

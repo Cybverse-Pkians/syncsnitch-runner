@@ -1,0 +1,13 @@
+# SyncSnitch Verification — w-20260927-063615-d1f5
+
+**Verdict:** ❌ RED
+
+| Check | Name | Result | Details |
+|---|---|---|---|
+| `V1` | consumer unit tests | ✅ pass | 8 passed, 1 skipped, 1 warning in 0.55s |
+| `V2` | v2 fixtures match the new contract | ✅ pass | 1 v2 fixtures match schema |
+| `V3` | consumer vs upstream v1 (backward compatible) | ✅ pass | 5/5 passed |
+| `V4` | consumer vs upstream v2 (new contract) | ❌ fail | 1/5 passed (failures: test_invoice_paid_order, test_unpaid_order_is_not_invoiced, test_payment_status_uses_real_amount, test_rest_contract_examples_parse) |
+| `V5` | Prism contract examples | ❌ fail | test_rest_contract_examples_parse not passed in both runs |
+| `V6` | diff scope | ✅ pass | 5 files changed within scope |
+

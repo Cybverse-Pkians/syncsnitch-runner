@@ -1,0 +1,80 @@
+{
+  "run_id": "w-20260927-063615-d1f5",
+  "mapping": [
+    {
+      "change_ids": ["rest:Order.total_price:property_removed", "grpc:orders.OrderSummary.3:field_removed", "db:orders.total_price:column_dropped"],
+      "old": "total_price",
+      "new": "total",
+      "rule": "property_removed/column_dropped"
+    },
+    {
+      "change_ids": ["rest:Order.customer_name:property_removed", "grpc:orders.OrderSummary.2:field_removed", "db:orders.customer_name:column_renamed"],
+      "old": "customer_name",
+      "new": "customer",
+      "rule": "property_removed/column_renamed"
+    },
+    {
+      "change_ids": ["rest:OrderStatus.PENDING:enum_value_removed", "db:orders.status.PENDING:value_renamed"],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "enum_value_removed/value_renamed"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "OrderDTO.customer_name",
+      "change_ids": ["rest:Order.customer_name:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update Pydantic model to include customer object and optional name"
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "OrderDTO.total_price",
+      "change_ids": ["rest:Order.total_price:property_removed"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update Pydantic model to include total object"
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "revenue.sql",
+      "change_ids": ["db:orders.total_price:column_dropped"],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Update SQL to use total_minor column"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "NOT_PAYABLE",
+      "change_ids": ["rest:OrderStatus.PENDING:enum_value_removed"],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Add AWAITING_PAYMENT to NOT_PAYABLE set"
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Missing fields in response model and status enum change"
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "Column total_price dropped"
+    }
+  ],
+  "migration_notes": "Orders v2 updates the money representation from float total_price to an integer total_minor + currency. Customer identification moves to a structured customer object. The status PENDING is renamed to AWAITING_PAYMENT, which is wire-compatible but changes the application logic. Consumers must implement tolerant readers for both old and new schemas during the rollout period."
+}

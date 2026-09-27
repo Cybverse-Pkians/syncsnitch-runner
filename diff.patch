@@ -1,0 +1,120 @@
+# generated protobuf stubs (*_pb2*.py) are hidden
+diff --git a/billing-service/.syncsnitch.json b/billing-service/.syncsnitch.json
+new file mode 100644
+index 0000000..f54c913
+--- /dev/null
++++ b/billing-service/.syncsnitch.json
+@@ -0,0 +1 @@
++{"upstream_repo": "kshiti26-11/demo", "upstream_pr": null, "upstream_base": "15f95af008e5060450fa81ff0a58ed50627b1b2e", "upstream_head": "61f6af0fb96b0241d60fd011ee4a2ece10439a1f", "run_id": "w-20260927-063615-d1f5"}
+\ No newline at end of file
+diff --git a/billing-service/billing/adapters/__init__.py b/billing-service/billing/adapters/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/billing-service/billing/adapters/orders_contract.py b/billing-service/billing/adapters/orders_contract.py
+new file mode 100644
+index 0000000..27a62ff
+--- /dev/null
++++ b/billing-service/billing/adapters/orders_contract.py
+@@ -0,0 +1,38 @@
++from dataclasses import dataclass
++from typing import Optional
++from decimal import Decimal
++
++@dataclass(frozen=True)
++class OrderView:
++    order_id: str
++    customer_name: str
++    amount_minor: int
++    currency: str
++    status: str
++    created_at: Optional[str] = None
++
++def normalize_status(value: str) -> str:
++    if value.startswith("ORDER_STATUS_"):
++        value = value[len("ORDER_STATUS_"):]
++    if value == "PENDING":
++        return "AWAITING_PAYMENT"
++    return value
++
++def from_rest(payload: dict) -> OrderView:
++    if "total" in payload:
++        customer_name = payload["customer"]["display_name"]
++        amount = payload["total"]["amount_minor"]
++        currency = payload["total"]["currency"]
++    else:
++        customer_name = payload["customer_name"]
++        amount = int(Decimal(str(payload["total_price"])) * 100)
++        currency = "USD"
++    
++    return OrderView(
++        order_id=payload["order_id"],
++        customer_name=customer_name,
++        amount_minor=amount,
++        currency=currency,
++        status=normalize_status(payload["status"]),
++        created_at=payload.get("created_at")
++    )
+diff --git a/billing-service/billing/reports/revenue.py b/billing-service/billing/reports/revenue.py
+index dc50557..fb8dace 100644
+--- a/billing-service/billing/reports/revenue.py
++++ b/billing-service/billing/reports/revenue.py
+@@ -4,9 +4,6 @@ from pathlib import Path
+ from sqlalchemy import create_engine, text
+ 
+ 
+-_SQL = (Path(__file__).parent / "revenue.sql").read_text()
+-
+-
+ def _round_half_up(d: Decimal) -> int:
+     return int(d.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+ 
+@@ -15,14 +12,32 @@ def run_revenue_report(db_url: str) -> list[dict]:
+     engine = create_engine(db_url)
+     try:
+         with engine.connect() as conn:
+-            rows = conn.execute(text(_SQL)).fetchall()
++            try:
++                version_res = conn.execute(text("SELECT version_num FROM alembic_version")).fetchone()
++                version_num = version_res[0] if version_res else "0000"
++            except Exception:
++                version_num = "0000"
++            
++            if version_num >= "0002":
++                sql = (Path(__file__).parent / "revenue_v2.sql").read_text()
++                rows = conn.execute(text(sql)).fetchall()
++                return [
++                    {
++                        "day": str(row.day)[:10],
++                        "revenue_minor": int(row.revenue),
++                    }
++                    for row in rows
++                ]
++            else:
++                sql = (Path(__file__).parent / "revenue.sql").read_text()
++                rows = conn.execute(text(sql)).fetchall()
++                return [
++                    {
++                        "day": str(row.day)[:10],
++                        "revenue_minor": _round_half_up(Decimal(str(row.revenue)) * 100),
++                    }
++                    for row in rows
++                ]
+     finally:
+         engine.dispose()
+ 
+-    return [
+-        {
+-            "day": str(row.day)[:10],
+-            "revenue_minor": _round_half_up(Decimal(str(row.revenue)) * 100),
+-        }
+-        for row in rows
+-    ]
+diff --git a/billing-service/billing/reports/revenue_v2.sql b/billing-service/billing/reports/revenue_v2.sql
+new file mode 100644
+index 0000000..856ee2b
+--- /dev/null
++++ b/billing-service/billing/reports/revenue_v2.sql
+@@ -0,0 +1,2 @@
++SELECT date(created_at) AS day, SUM(total_minor) AS revenue FROM orders
++WHERE status IN ('PAID', 'SHIPPED') GROUP BY day ORDER BY day
+\ No newline at end of file

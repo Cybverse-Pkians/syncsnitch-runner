@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="5" time="1.782" timestamp="2026-09-27T06:39:23.009705+00:00" hostname="b168de59edf5"><testcase classname="tests.integration.test_contract" name="test_invoice_paid_order" time="0.196"><failure message="pydantic_core._pydantic_core.ValidationError: 2 validation errors for OrderDTO&#10;customer_name&#10;  Field required [type=missing, input_value={'order_id': 'o-1001', 'c... '2026-09-01T10:00:00Z'}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/missing&#10;total_price&#10;  Field required [type=missing, input_value={'order_id': 'o-1001', 'c... '2026-09-01T10:00:00Z'}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/missing">client = &lt;starlette.testclient.TestClient object at 0x7f13832a31a0&gt;
+
+    def test_invoice_paid_order(client):
+&gt;       r = client.post("/invoices/o-1001")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_contract.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+/usr/local/lib/python3.12/site-packages/starlette/testclient.py:463: in request
+    return super().request(
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/starlette/testclient.py:360: in handle_request
+    raise exc
+/usr/local/lib/python3.12/site-packages/starlette/testclient.py:357: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.12/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:1281: in handle
+    await super().handle(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/routing.py:282: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:352: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+billing/api.py:37: in create_invoice
+    invoice = invoice_from_order_payload(payload)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'order_id': 'o-1001', 'customer': {'customer_id': 'c-1001', 'display_name': 'Ada Lovelace'}, 'total': {'amount_minor': 1999, 'currency': 'USD'}, 'status': 'PAID', ...}
+
+    def invoice_from_order_payload(payload: dict) -&gt; dict | None:
+&gt;       return build_invoice(OrderDTO.model_validate(payload))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 2 validation errors for OrderDTO
+E       customer_name
+E         Field required [type=missing, input_value={'order_id': 'o-1001', 'c... '2026-09-01T10:00:00Z'}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.13/v/missing
+E       total_price
+E         Field required [type=missing, input_value={'order_id': 'o-1001', 'c... '2026-09-01T10:00:00Z'}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.13/v/missing
+
+billing/contract_entrypoints.py:6: ValidationError</failure></testcase><testcase classname="tests.integration.test_contract" name="test_unpaid_order_is_not_invoiced" time="0.018"><failure message="pydantic_core._pydantic_core.ValidationError: 2 validation errors for OrderDTO&#10;customer_name&#10;  Field required [type=missing, input_value={'order_id': 'o-1002', 'c... '2026-09-02T11:00:00Z'}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/missing&#10;total_price&#10;  Field required [type=missing, input_value={'order_id': 'o-1002', 'c... '2026-09-02T11:00:00Z'}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/missing">client = &lt;starlette.testclient.TestClient object at 0x7f13832a31a0&gt;
+
+    def test_unpaid_order_is_not_invoiced(client):
+&gt;       r = client.post("/invoices/o-1002")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_contract.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+/usr/local/lib/python3.12/site-packages/starlette/testclient.py:463: in request
+    return super().request(
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/starlette/testclient.py:360: in handle_request
+    raise exc
+/usr/local/lib/python3.12/site-packages/starlette/testclient.py:357: in handle_request
+    portal.call(self.app, scope, receive, send)
+/usr/local/lib/python3.12/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.12/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+/usr/local/lib/python3.12/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+/usr/local/lib/python3.12/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/routing.py:676: in __call__
+    await self.middleware_stack(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:1281: in handle
+    await super().handle(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/routing.py:282: in handle
+    await self.app(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+/usr/local/lib/python3.12/site-packages/fastapi/routing.py:352: in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+billing/api.py:37: in create_invoice
+    invoice = invoice_from_order_payload(payload)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'order_id': 'o-1002', 'customer': {'customer_id': 'c-1002', 'display_name': 'Alan Turing'}, 'total': {'amount_minor': 500, 'currency': 'USD'}, 'status': 'AWAITING_PAYMENT', ...}
+
+    def invoice_from_order_payload(payload: dict) -&gt; dict | None:
+&gt;       return build_invoice(OrderDTO.model_validate(payload))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 2 validation errors for OrderDTO
+E       customer_name
+E         Field required [type=missing, input_value={'order_id': 'o-1002', 'c... '2026-09-02T11:00:00Z'}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.13/v/missing
+E       total_price
+E         Field required [type=missing, input_value={'order_id': 'o-1002', 'c... '2026-09-02T11:00:00Z'}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.13/v/missing
+
+billing/contract_entrypoints.py:6: ValidationError</failure></testcase><testcase classname="tests.integration.test_contract" name="test_payment_status_uses_real_amount" time="0.059"><failure message="AssertionError: assert {'order_id': ...rency': 'USD'} == {'order_id': ...rency': 'USD'}&#10;  &#10;  Omitting 3 identical items, use -vv to show&#10;  Differing items:&#10;  {'amount_minor': 0} != {'amount_minor': 1999}&#10;  Use -v to get more diff">client = &lt;starlette.testclient.TestClient object at 0x7f13832a31a0&gt;
+
+    def test_payment_status_uses_real_amount(client):
+        r = client.get("/payments/o-1001/status")
+        assert r.status_code == 200
+&gt;       assert r.json() == {"order_id": "o-1001", "paid": True, "amount_minor": 1999, "currency": "USD"}
+E       AssertionError: assert {'order_id': ...rency': 'USD'} == {'order_id': ...rency': 'USD'}
+E         
+E         Omitting 3 identical items, use -vv to show
+E         Differing items:
+E         {'amount_minor': 0} != {'amount_minor': 1999}
+E         Use -v to get more diff
+
+tests/integration/test_contract.py:56: AssertionError</failure></testcase><testcase classname="tests.integration.test_contract" name="test_revenue_report" time="0.161" /><testcase classname="tests.integration.test_contract" name="test_rest_contract_examples_parse" time="0.047"><failure message="pydantic_core._pydantic_core.ValidationError: 2 validation errors for OrderDTO&#10;customer_name&#10;  Field required [type=missing, input_value={'order_id': 'o-1001', 'c... '2026-09-01T10:00:00Z'}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/missing&#10;total_price&#10;  Field required [type=missing, input_value={'order_id': 'o-1001', 'c... '2026-09-01T10:00:00Z'}, input_type=dict]&#10;    For further information visit https://errors.pydantic.dev/2.13/v/missing">def test_rest_contract_examples_parse():
+        paid = httpx.get(f"{MOCK}/orders/o-1001", headers={"Prefer": "example=paid"}, timeout=10).json()
+        unpaid = httpx.get(f"{MOCK}/orders/o-1002", headers={"Prefer": "example=unpaid"}, timeout=10).json()
+&gt;       assert invoice_from_order_payload(paid)["total_minor"] == 2164
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/integration/test_contract.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+payload = {'order_id': 'o-1001', 'customer': {'customer_id': 'c-1001', 'display_name': 'Ada Lovelace'}, 'total': {'amount_minor': 1999, 'currency': 'USD'}, 'status': 'PAID', ...}
+
+    def invoice_from_order_payload(payload: dict) -&gt; dict | None:
+&gt;       return build_invoice(OrderDTO.model_validate(payload))
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       pydantic_core._pydantic_core.ValidationError: 2 validation errors for OrderDTO
+E       customer_name
+E         Field required [type=missing, input_value={'order_id': 'o-1001', 'c... '2026-09-01T10:00:00Z'}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.13/v/missing
+E       total_price
+E         Field required [type=missing, input_value={'order_id': 'o-1001', 'c... '2026-09-01T10:00:00Z'}, input_type=dict]
+E           For further information visit https://errors.pydantic.dev/2.13/v/missing
+
+billing/contract_entrypoints.py:6: ValidationError</failure></testcase></testsuite></testsuites>

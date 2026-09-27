@@ -1,0 +1,13 @@
+{
+  "run_id": "w-20260927-063615-d1f5",
+  "verdict": "red",
+  "reasons": [
+    "V4 and V5 failed due to contract mismatches with upstream v2.",
+    "Failures include: test_invoice_paid_order, test_unpaid_order_is_not_invoiced, test_payment_status_uses_real_amount, and test_rest_contract_examples_parse."
+  ],
+  "fix_instructions": [
+    "Update billing-service/src/event_processor.py to ensure it correctly maps payment status using the real amount as per the new v2 contract.",
+    "Update billing-service/tests/test_invoices.py to align invoice generation logic with the v2 requirements for paid and unpaid orders.",
+    "Update billing-service/contracts/v2/order_events.json to match the example schema expected by Prism, fixing test_rest_contract_examples_parse."
+  ]
+}
