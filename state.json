@@ -1,0 +1,813 @@
+{
+ "run_id": "w-20260927-120026-5c8d",
+ "phase": "complete",
+ "spec": {
+  "link": "https://github.com/kshiti26-11/demo",
+  "repo": "kshiti26-11/demo",
+  "upstream": "orders-service",
+  "consumer": "billing-service",
+  "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head": "main",
+  "created_at": "2026-09-27T12:00:38+00:00",
+  "error": null,
+  "bob_command": "/syncsnitch https://demo-smoky-six-28.vercel.app/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main&run=w-20260927-120026-5c8d",
+  "analyze_url": "/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main"
+ },
+ "tracer": {
+  "status": "done",
+  "breaking": 9,
+  "surfaces": [
+   "REST",
+   "gRPC",
+   "DB"
+  ],
+  "hits": 21,
+  "by_surface": {
+   "rest": 3,
+   "grpc": 3,
+   "db": 3
+  },
+  "files": 9,
+  "endpoints": [
+   "GET /payments/{order_id}/status",
+   "GET /reports/revenue",
+   "POST /invoices/{order_id}"
+  ],
+  "classified": true,
+  "loud": 2,
+  "silent": 1,
+  "failures": {
+   "POST /invoices/{order_id}": "loud",
+   "GET /payments/{order_id}/status": "silent",
+   "GET /reports/revenue": "loud"
+  },
+  "silent_why": "Old gRPC client reads removed field total_price as 0.0 without error, resulting in incorrect amount_minor values."
+ },
+ "transformer": {
+  "status": "done",
+  "branch": "syncsnitch/w-20260927-120026-5c8d",
+  "files": 14,
+  "insertions": 262,
+  "deletions": 38,
+  "uncommitted": 0,
+  "commits": 1,
+  "unit_tests": "pass"
+ },
+ "verifier": {
+  "status": "done",
+  "checks": [
+   {
+    "id": "V1",
+    "status": "pass",
+    "details": "8 passed, 1 skipped, 6 warnings in 0.49s"
+   },
+   {
+    "id": "V2",
+    "status": "pass",
+    "details": "3 v2 fixtures match schema"
+   },
+   {
+    "id": "V3",
+    "status": "pass",
+    "details": "5/5 passed"
+   },
+   {
+    "id": "V4",
+    "status": "pass",
+    "details": "5/5 passed"
+   },
+   {
+    "id": "V5",
+    "status": "pass",
+    "details": "test_rest_contract_examples_parse passed against v1 and v2"
+   },
+   {
+    "id": "V6",
+    "status": "pass",
+    "details": "14 files changed within scope"
+   }
+  ],
+  "verdict": "green",
+  "source": "local"
+ },
+ "actions": null,
+ "companion_pr_url": "https://github.com/Kshiti26-11/Demo/pull/11",
+ "replay_url": "/runs/w-20260927-120026-5c8d",
+ "diff_available": true,
+ "diff_key": "1:262:38:True",
+ "runner": {
+  "state": "complete",
+  "backend": "gemini",
+  "label": "Gemini",
+  "model": "gemini-3.5-flash-lite",
+  "unit": "tokens",
+  "budget": 3000000.0,
+  "spent": 230914.0,
+  "spent_by": {
+   "tracer": 12209.0,
+   "transformer": 212360.0,
+   "verifier": 6345.0
+  },
+  "tasks": {
+   "tracer": "qgW5arSXB7CV_uMP7pGluAY",
+   "transformer": "uAW5apLDCKaa9MoP99mI0AQ",
+   "verifier": "Iga5aue6Otuo_PUPnfC0KA"
+  },
+  "docker": true,
+  "error": null,
+  "verdict": "green",
+  "problems": [],
+  "can_approve": false,
+  "can_reject": false,
+  "can_start": false
+ },
+ "events": [
+  {
+   "ts": "2026-09-27T12:00:38.017+00:00",
+   "step": "S0",
+   "agent": "site",
+   "level": "info",
+   "msg": "Target received: https://github.com/kshiti26-11/demo",
+   "key": "e0"
+  },
+  {
+   "ts": "2026-09-27T12:00:38.017+00:00",
+   "step": "S0",
+   "agent": "site",
+   "level": "info",
+   "msg": "Orchestrating: S1-S2 engine -> S3 Tracer -> S4 Transformer -> S5 verify -> S6 Verifier (AI agents) -> S7 human gate -> S8 draft PR -> S9 artifact",
+   "key": "e1"
+  },
+  {
+   "ts": "2026-09-27T12:00:38.110+00:00",
+   "step": "S0",
+   "agent": "site",
+   "level": "info",
+   "msg": "Resolving kshiti26-11/demo on GitHub (branches, contract folders, history)",
+   "key": "e2"
+  },
+  {
+   "ts": "2026-09-27T12:00:38.916+00:00",
+   "step": "S0",
+   "agent": "site",
+   "level": "ok",
+   "msg": "Upstream orders-service (contract owner) -> consumer billing-service; base 15f95af008e5 (feat: orders-service v1 (REST + gRPC + DB contract)) -> head main",
+   "key": "e3"
+  },
+  {
+   "ts": "2026-09-27T12:00:39.507+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "info",
+   "msg": "S1 detect: fetching 2 contract file(s) at 15f95af and 159ef5c, 1 new migration(s)",
+   "key": "e4"
+  },
+  {
+   "ts": "2026-09-27T12:00:39.914+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "warn",
+   "msg": "REST (OpenAPI): 3 breaking - enum_value_removed OrderStatus.PENDING, property_removed Order.customer_name, property_removed Order.total_price",
+   "key": "e5"
+  },
+  {
+   "ts": "2026-09-27T12:00:39.914+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "warn",
+   "msg": "gRPC (protobuf): 3 breaking - enum_value_renamed orders.OrderStatus.1, field_removed orders.OrderSummary.2, field_removed orders.OrderSummary.3",
+   "key": "e6"
+  },
+  {
+   "ts": "2026-09-27T12:00:39.914+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "warn",
+   "msg": "DB (Alembic): 3 breaking - column_renamed orders.customer_name, value_renamed orders.status.PENDING, column_dropped orders.total_price",
+   "key": "e7"
+  },
+  {
+   "ts": "2026-09-27T12:00:39.914+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "ok",
+   "msg": "S1 detect: 9 breaking of 26 changes (REST 3, gRPC 3, DB 3)",
+   "key": "e8"
+  },
+  {
+   "ts": "2026-09-27T12:00:39.914+00:00",
+   "step": "S2",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "S2 trace: AST + SQL + proto + fixture scan of 29 consumer files in billing-service",
+   "key": "e9"
+  },
+  {
+   "ts": "2026-09-27T12:00:39.945+00:00",
+   "step": "S2",
+   "agent": "tracer",
+   "level": "ok",
+   "msg": "S2 trace: 21 usages in 9 files -> GET /payments/{order_id}/status, GET /reports/revenue, POST /invoices/{order_id}",
+   "key": "e10"
+  },
+  {
+   "ts": "2026-09-27T12:00:40.261+00:00",
+   "step": "S2",
+   "agent": "site",
+   "level": "ok",
+   "msg": "S1-S2 done: starting the 3 agents on Gemini (gemini-3.5-flash) - Tracer -> Transformer -> Verifier, no IDE step needed",
+   "key": "e11"
+  },
+  {
+   "ts": "2026-09-27T12:00:40.266+00:00",
+   "step": "S2",
+   "agent": "engine",
+   "level": "info",
+   "msg": "Preparing the agents' workspace: cloning kshiti26-11/demo into .syncsnitch/work/w-20260927-120026-5c8d",
+   "key": "e12"
+  },
+  {
+   "ts": "2026-09-27T12:00:40.930+00:00",
+   "step": "S2",
+   "agent": "engine",
+   "level": "ok",
+   "msg": "Workspace ready: branch syncsnitch/w-20260927-120026-5c8d from main (159ef5cecf0e); upstream orders-service is read-only",
+   "key": "e13"
+  },
+  {
+   "ts": "2026-09-27T12:00:40.935+00:00",
+   "step": "S2",
+   "agent": "engine",
+   "level": "info",
+   "msg": "Upstream change proposal found: orders-service/docs/orders-v2-change-proposal.docx (the Tracer reads it)",
+   "key": "e14"
+  },
+  {
+   "ts": "2026-09-27T12:00:40.935+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Tracer started: classifying every traced usage as loud or silent",
+   "key": "e15"
+  },
+  {
+   "ts": "2026-09-27T12:00:40.945+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Gemini (gemini-3.5-flash) \u00b7 agent syncsnitch-tracer \u00b7 budget 900,000 tokens",
+   "src": "gemini",
+   "key": "e16"
+  },
+  {
+   "ts": "2026-09-27T12:00:49.814+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash: the daily quota is used up, switching to gemini-3.7-flash",
+   "src": "gemini",
+   "key": "e17"
+  },
+  {
+   "ts": "2026-09-27T12:01:14.964+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.7-flash: the daily quota is used up, switching to gemini-3.6-flash",
+   "src": "gemini",
+   "key": "e18"
+  },
+  {
+   "ts": "2026-09-27T12:01:46.019+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.6-flash: the daily quota is used up, switching to gemini-3.5-flash-lite",
+   "src": "gemini",
+   "key": "e19"
+  },
+  {
+   "ts": "2026-09-27T12:01:49.971+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "write_file \u00b7 run/impact.json",
+   "src": "gemini",
+   "key": "e20"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.976+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Impact analysis successfully written to run/impact.json.",
+   "src": "gemini",
+   "key": "e21"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.976+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Confirmed 8 core candidate usages across REST, gRPC, and DB surfaces.",
+   "src": "gemini",
+   "key": "e22"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.976+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Identified 3 broken endpoints: POST /invoices/{order_id} (loud/silent), GET /payments/{order_id}/status (silent), and GET /reports/revenue (loud).",
+   "src": "gemini",
+   "key": "e23"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.976+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Documented mapping for CH1 (total_price), CH2 (customer_name), and CH3 (PENDING status rename).",
+   "src": "gemini",
+   "key": "e24"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.976+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Recorded migration guidance requiring tolerant dual-version readers for the rollout period.",
+   "src": "gemini",
+   "key": "e25"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.976+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "ok",
+   "msg": "Gemini session finished: 1 tool calls \u00b7 2 turns \u00b7 12,209 tokens \u00b7 1m 19s \u00b7 gemini-3.5-flash-lite",
+   "src": "gemini",
+   "key": "e26"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.977+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "The Tracer left out 1 file(s) the scanner hit (contracts/upstream/orders.proto): the runner added them to impact.json",
+   "key": "e27"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.978+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "ok",
+   "msg": "Tracer done: impact.json - 3 endpoints (2 loud, 1 silent)",
+   "key": "e28"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.984+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "Transformer started on branch syncsnitch/w-20260927-120026-5c8d: tolerant reader for v1 + v2",
+   "key": "e29"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.993+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "Gemini (gemini-3.5-flash-lite) \u00b7 agent syncsnitch-transformer \u00b7 budget 2,537,791 tokens",
+   "src": "gemini",
+   "key": "e30"
+  },
+  {
+   "ts": "2026-09-27T12:01:59.993+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "warn",
+   "msg": "Skipping gemini-3.5-flash, gemini-3.7-flash, gemini-3.6-flash: daily quota used up until 07:00 local time",
+   "src": "gemini",
+   "key": "e31"
+  },
+  {
+   "ts": "2026-09-27T12:02:06.114+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/billing/adapters/orders_contract.py",
+   "src": "gemini",
+   "key": "e32"
+  },
+  {
+   "ts": "2026-09-27T12:02:07.025+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/billing/adapters/__init__.py",
+   "src": "gemini",
+   "key": "e33"
+  },
+  {
+   "ts": "2026-09-27T12:02:08.691+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/contracts/upstream/orders.proto",
+   "src": "gemini",
+   "key": "e34"
+  },
+  {
+   "ts": "2026-09-27T12:02:10.303+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/billing/reports/revenue_v2.sql",
+   "src": "gemini",
+   "key": "e35"
+  },
+  {
+   "ts": "2026-09-27T12:02:11.194+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/billing/reports/revenue_v1.sql",
+   "src": "gemini",
+   "key": "e36"
+  },
+  {
+   "ts": "2026-09-27T12:02:12.134+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/tests/fixtures/order_v2_paid.json",
+   "src": "gemini",
+   "key": "e37"
+  },
+  {
+   "ts": "2026-09-27T12:02:13.298+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/tests/fixtures/order_v2_unpaid.json",
+   "src": "gemini",
+   "key": "e38"
+  },
+  {
+   "ts": "2026-09-27T12:02:14.586+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/.syncsnitch.json",
+   "src": "gemini",
+   "key": "e39"
+  },
+  {
+   "ts": "2026-09-27T12:02:15.614+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/billing/models/order.py",
+   "src": "gemini",
+   "key": "e40"
+  },
+  {
+   "ts": "2026-09-27T12:02:17.426+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/billing/services/invoice.py",
+   "src": "gemini",
+   "key": "e41"
+  },
+  {
+   "ts": "2026-09-27T12:02:19.113+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/billing/services/payments.py",
+   "src": "gemini",
+   "key": "e42"
+  },
+  {
+   "ts": "2026-09-27T12:02:21.022+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/billing/reports/revenue.py",
+   "src": "gemini",
+   "key": "e43"
+  },
+  {
+   "ts": "2026-09-27T12:02:22.125+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "$ cd billing-service && uv run python scripts/regen_stubs.py && uv run pytest -q",
+   "src": "gemini",
+   "key": "e44"
+  },
+  {
+   "ts": "2026-09-27T12:02:23.940+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "write_file \u00b7 billing-service/contracts/upstream/orders.proto",
+   "src": "gemini",
+   "key": "e45"
+  },
+  {
+   "ts": "2026-09-27T12:02:59.716+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "$ cd billing-service && uv run python scripts/regen_stubs.py && uv run pytest -q",
+   "src": "gemini",
+   "key": "e46"
+  },
+  {
+   "key": "commit-1a0abc0",
+   "ts": "2026-09-27T12:03:02.000+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "ok",
+   "msg": "commit 1a0abc0 on syncsnitch/w-20260927-120026-5c8d: fix(contract): tolerant reader for the orders-service contract change (SyncSnitch w-20260927-120026-5c8d)"
+  },
+  {
+   "ts": "2026-09-27T12:03:02.825+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "$ cd billing-service && git add -A . && git commit -q -m \"fix(contract): tolerant reader for the orders-service contract change (SyncSnitch w-20260927-120026-5c8d)\" -m \"SyncSnitch-Agent: Gemini gemini-3.5-flash-lite (w-202",
+   "src": "gemini",
+   "key": "e47"
+  },
+  {
+   "ts": "2026-09-27T12:03:03.671+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "$ cd billing-service && git diff --shortstat HEAD~1",
+   "src": "gemini",
+   "key": "e48"
+  },
+  {
+   "ts": "2026-09-27T12:03:04.428+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "info",
+   "msg": "14 files changed, 262 insertions(+), 38 deletions(-)",
+   "src": "gemini",
+   "key": "e49"
+  },
+  {
+   "ts": "2026-09-27T12:03:04.428+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "ok",
+   "msg": "Gemini session finished: 17 tool calls \u00b7 18 turns \u00b7 212,360 tokens \u00b7 1m 04s \u00b7 gemini-3.5-flash-lite",
+   "src": "gemini",
+   "key": "e50"
+  },
+  {
+   "ts": "2026-09-27T12:03:04.447+00:00",
+   "step": "S4",
+   "agent": "transformer",
+   "level": "ok",
+   "msg": "Transformer done: 14 files, +262 / -38 lines, 1 commit(s) on syncsnitch/w-20260927-120026-5c8d",
+   "key": "e51"
+  },
+  {
+   "ts": "2026-09-27T12:03:04.677+00:00",
+   "step": "S5",
+   "agent": "verifier",
+   "level": "info",
+   "msg": "S5 verify: unit tests, v2 fixtures, Docker mock containers vs v1 and v2",
+   "key": "e52"
+  },
+  {
+   "ts": "2026-09-27T12:03:46.797+00:00",
+   "step": "S5",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "S5 verify: 6 passed, 0 failed, 0 skipped -> GREEN",
+   "key": "e53"
+  },
+  {
+   "ts": "2026-09-27T12:03:46.813+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "info",
+   "msg": "Verifier started: judging verification.json",
+   "key": "e54"
+  },
+  {
+   "ts": "2026-09-27T12:03:46.813+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "info",
+   "msg": "Gemini (gemini-3.5-flash-lite) \u00b7 agent syncsnitch-verifier \u00b7 budget 2,775,431 tokens",
+   "src": "gemini",
+   "key": "e55"
+  },
+  {
+   "ts": "2026-09-27T12:03:46.814+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "warn",
+   "msg": "Skipping gemini-3.5-flash, gemini-3.7-flash, gemini-3.6-flash: daily quota used up until 07:00 local time",
+   "src": "gemini",
+   "key": "e56"
+  },
+  {
+   "ts": "2026-09-27T12:03:47.808+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "info",
+   "msg": "list_dir \u00b7 .syncsnitch/runs/w-20260927-120026-5c8d",
+   "src": "gemini",
+   "key": "e57"
+  },
+  {
+   "ts": "2026-09-27T12:03:48.871+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "info",
+   "msg": "read_file \u00b7 run/verification.json",
+   "src": "gemini",
+   "key": "e58"
+  },
+  {
+   "ts": "2026-09-27T12:03:49.788+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "info",
+   "msg": "write_file \u00b7 run/verdict.json",
+   "src": "gemini",
+   "key": "e59"
+  },
+  {
+   "ts": "2026-09-27T12:03:50.398+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "info",
+   "msg": "green: All checks V1-V6 passed successfully.",
+   "src": "gemini",
+   "key": "e60"
+  },
+  {
+   "ts": "2026-09-27T12:03:50.399+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "Gemini session finished: 3 tool calls \u00b7 4 turns \u00b7 6,345 tokens \u00b7 0m 03s \u00b7 gemini-3.5-flash-lite",
+   "src": "gemini",
+   "key": "e61"
+  },
+  {
+   "ts": "2026-09-27T12:03:50.400+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "Verifier verdict: GREEN - All checks V1-V6 passed successfully.",
+   "key": "e62"
+  },
+  {
+   "ts": "2026-09-27T12:03:50.400+00:00",
+   "step": "S7",
+   "agent": "human",
+   "level": "info",
+   "msg": "S7 human approval gate: review the patch, then approve or reject on this page",
+   "key": "e63"
+  },
+  {
+   "key": "impact",
+   "ts": "2026-09-27T12:03:51.000+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "ok",
+   "msg": "impact.json: POST /invoices/{order_id} LOUD \u00b7 GET /payments/{order_id}/status SILENT \u00b7 GET /reports/revenue LOUD"
+  },
+  {
+   "key": "check-V1-pass",
+   "ts": "2026-09-27T12:03:51.000+00:00",
+   "step": "S5",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "V1 consumer unit tests: PASS - 8 passed, 1 skipped, 6 warnings in 0.49s"
+  },
+  {
+   "key": "check-V2-pass",
+   "ts": "2026-09-27T12:03:51.000+00:00",
+   "step": "S5",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "V2 v2 fixtures match the new contract: PASS - 3 v2 fixtures match schema"
+  },
+  {
+   "key": "check-V3-pass",
+   "ts": "2026-09-27T12:03:51.000+00:00",
+   "step": "S5",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "V3 consumer vs upstream v1 (backward compatible): PASS - 5/5 passed"
+  },
+  {
+   "key": "check-V4-pass",
+   "ts": "2026-09-27T12:03:51.000+00:00",
+   "step": "S5",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "V4 consumer vs upstream v2 (new contract): PASS - 5/5 passed"
+  },
+  {
+   "key": "check-V5-pass",
+   "ts": "2026-09-27T12:03:51.000+00:00",
+   "step": "S5",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "V5 Prism contract examples: PASS - test_rest_contract_examples_parse passed against v1 and v2"
+  },
+  {
+   "key": "check-V6-pass",
+   "ts": "2026-09-27T12:03:51.000+00:00",
+   "step": "S5",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "V6 diff scope: PASS - 14 files changed within scope"
+  },
+  {
+   "key": "verdict",
+   "ts": "2026-09-27T12:03:51.000+00:00",
+   "step": "S6",
+   "agent": "verifier",
+   "level": "ok",
+   "msg": "verdict.json: GREEN - All checks V1-V6 passed successfully."
+  },
+  {
+   "ts": "2026-09-27T12:26:17.204+00:00",
+   "step": "S7",
+   "agent": "human",
+   "level": "ok",
+   "msg": "Approved by the human on the run page",
+   "key": "e64"
+  },
+  {
+   "ts": "2026-09-27T12:26:17.356+00:00",
+   "step": "S8",
+   "agent": "engine",
+   "level": "info",
+   "msg": "S8 report: pr_body.md rendered",
+   "key": "e65"
+  },
+  {
+   "ts": "2026-09-27T12:26:17.369+00:00",
+   "step": "S8",
+   "agent": "engine",
+   "level": "info",
+   "msg": "S8: pushing syncsnitch/w-20260927-120026-5c8d and opening a DRAFT companion PR against main",
+   "key": "e66"
+  },
+  {
+   "key": "artifact",
+   "ts": "2026-09-27T12:26:21+00:00",
+   "step": "S9",
+   "agent": "engine",
+   "level": "ok",
+   "msg": "S9 run artifact published \u00b7 companion PR https://github.com/Kshiti26-11/Demo/pull/11"
+  },
+  {
+   "ts": "2026-09-27T12:26:21.249+00:00",
+   "step": "S8",
+   "agent": "engine",
+   "level": "ok",
+   "msg": "Draft companion PR opened: https://github.com/Kshiti26-11/Demo/pull/11",
+   "key": "e67"
+  },
+  {
+   "ts": "2026-09-27T12:26:21.290+00:00",
+   "step": "S9",
+   "agent": "engine",
+   "level": "ok",
+   "msg": "S9 run artifact written: /home/runner/work/syncsnitch-runner/syncsnitch-runner/web/runs/w-20260927-120026-5c8d.json",
+   "key": "e68"
+  },
+  {
+   "ts": "2026-09-27T12:26:21.296+00:00",
+   "step": "S9",
+   "agent": "site",
+   "level": "ok",
+   "msg": "Run complete: replay page /runs/w-20260927-120026-5c8d",
+   "key": "e69"
+  }
+ ],
+ "cloud": {
+  "job": "36318970654",
+  "mode": "publish",
+  "html_url": "https://github.com/Cybverse-Pkians/syncsnitch-runner/actions/runs/36318970654",
+  "runner_repo": "Cybverse-Pkians/syncsnitch-runner",
+  "snapshot_at": "2026-09-27T12:26:23Z"
+ }
+}

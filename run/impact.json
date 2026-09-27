@@ -1,0 +1,191 @@
+{
+  "run_id": "w-20260927-120026-5c8d",
+  "mapping": [
+    {
+      "change_ids": [
+        "CH1"
+      ],
+      "old": "total_price",
+      "new": "total { amount_minor, currency }",
+      "rule": "property_removed / field_removed / column_dropped"
+    },
+    {
+      "change_ids": [
+        "CH2"
+      ],
+      "old": "customer_name",
+      "new": "customer { customer_id, display_name }",
+      "rule": "property_removed / field_removed / column_renamed"
+    },
+    {
+      "change_ids": [
+        "CH3"
+      ],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "enum_value_removed / value_renamed / enum_value_renamed"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "customer_name",
+      "change_ids": [
+        "CH2"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Support both customer { display_name } and customer_name"
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "total_price",
+      "change_ids": [
+        "CH1"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Support both total { amount_minor } and total_price"
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "total_price",
+      "change_ids": [
+        "CH1"
+      ],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Use SUM(total_minor) for migration 0002"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "PENDING",
+      "change_ids": [
+        "CH3"
+      ],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Treat both PENDING and AWAITING_PAYMENT as 'not payable'"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "total_price",
+      "change_ids": [
+        "CH1"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "total_price",
+      "change_ids": [
+        "CH1"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "customer_name",
+      "change_ids": [
+        "CH2"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name when present"
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "total_price",
+      "change_ids": [
+        "CH1"
+      ],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Vendor v2 proto and read total field"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "grpc",
+      "failure": "unknown",
+      "endpoint": null,
+      "source": "runner",
+      "fix": "Added by the runner: the scanner found this usage and the Tracer did not list it"
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Pydantic validation and invoice attribute access fail on removed fields, and PENDING status change causes silent incorrect payable checks."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "Old gRPC client reads removed field total_price as 0.0 without error, resulting in incorrect amount_minor values."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "SQL query references dropped column total_price, raising database execution errors."
+    }
+  ],
+  "migration_notes": "Orders v2 changes how money, customer and payment state are represented across REST, gRPC and DB. Consumers must ship tolerant readers that accept both v1 and v2 simultaneously during rollout. Specifically, read total.amount_minor when present, else round(total_price * 100). Read customer.display_name when present, else customer_name. Treat both PENDING and AWAITING_PAYMENT as not payable. For SQL reports, check alembic_version and use appropriate columns."
+}
