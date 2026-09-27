@@ -1,0 +1,10 @@
+{
+  "run_id": "w-20260927-092147-9661",
+  "verdict": "red",
+  "reasons": [
+    "V4 consumer vs upstream v2 failed on test_revenue_report due to missing total_price column in orders table"
+  ],
+  "fix_instructions": [
+    "Update billing-service/billing/reports/revenue_v2.sql to use total/amount_minor or the appropriate v2 schema instead of total_price."
+  ]
+}
