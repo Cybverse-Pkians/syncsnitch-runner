@@ -1,0 +1,75 @@
+{
+  "run_id": "w-20260927-131221-11a5",
+  "link": "https://github.com/Kshiti26-11/demo",
+  "repo": "Kshiti26-11/demo",
+  "status": "traced",
+  "created_at": "2026-09-27T13:12:36+00:00",
+  "site_url": "https://demo-smoky-six-28.vercel.app",
+  "overrides": {
+    "upstream": "orders-service",
+    "consumer": "billing-service",
+    "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+    "head": "main"
+  },
+  "traced_at": "2026-09-27T13:12:39.751+00:00",
+  "upstream": "orders-service",
+  "consumer": "billing-service",
+  "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head": "main",
+  "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head_sha": "159ef5cecf0e320f87ae52eb40e125c60463d956",
+  "default_branch": "main",
+  "summary": {
+    "total": 26,
+    "breaking": 9,
+    "by_surface": {
+      "rest": 3,
+      "grpc": 3,
+      "db": 3
+    },
+    "files": 9,
+    "endpoints": [
+      "GET /payments/{order_id}/status",
+      "GET /reports/revenue",
+      "POST /invoices/{order_id}"
+    ]
+  },
+  "hits": 21,
+  "bob_command": "/syncsnitch https://demo-smoky-six-28.vercel.app/analyze?repo=Kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main&run=w-20260927-131221-11a5",
+  "analyze_url": "/analyze?repo=Kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main",
+  "runner": {
+    "state": "approval",
+    "problems": [],
+    "error": null,
+    "backend": "gemini",
+    "label": "Gemini",
+    "model": "gemini-3.5-flash-lite",
+    "unit": "tokens",
+    "budget": 3000000.0,
+    "docker": true,
+    "started_at": "2026-09-27T13:12:43+00:00",
+    "updated_at": "2026-09-27T13:20:31.096+00:00",
+    "agents": {
+      "tracer": "done",
+      "transformer": "done",
+      "verifier": "done"
+    },
+    "stages": {
+      "tracer": "done",
+      "transformer": "done",
+      "verify": "done",
+      "verifier": "done"
+    },
+    "spent": {
+      "tracer": 12782.0,
+      "transformer": 268426.0,
+      "verifier": 4922.0
+    },
+    "tasks": {
+      "tracer": "Wxe5atiQDpX_qtsPuNu2oAI",
+      "transformer": "Zxe5arG6LITpqtsPuYaH6Aw",
+      "verifier": "GRi5apjzJumP6dkPpaaV6Aw"
+    },
+    "verdict": "green"
+  }
+}

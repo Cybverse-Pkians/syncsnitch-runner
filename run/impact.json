@@ -1,0 +1,156 @@
+{
+  "run_id": "w-20260927-131221-11a5",
+  "mapping": [
+    {
+      "change_ids": ["CH1"],
+      "old": "total_price",
+      "new": "total",
+      "rule": "Property/field removed or renamed"
+    },
+    {
+      "change_ids": ["CH2"],
+      "old": "customer_name",
+      "new": "customer",
+      "rule": "Property/field removed or renamed"
+    },
+    {
+      "change_ids": ["CH3"],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "Enum value renamed"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name when present, else customer_name."
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else round(total_price * 100)."
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Use SUM(total_price) for 0001 and SUM(total_minor) for 0002."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Treat both PENDING and AWAITING_PAYMENT as not payable."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else round(total_price * 100)."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else round(total_price * 100)."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name when present, else customer_name."
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Prefer total when HasField is true."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "ORDER_STATUS_PENDING",
+      "change_ids": ["CH3"],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Vendor v2 proto and handle renamed enum value."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Vendor v2 proto with deprecated fields."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Vendor v2 proto with deprecated fields."
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Missing total_price property causes validation/AttributeError failures, while customer_name and PENDING cause silent incorrect data issues."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "Old gRPC clients read removed fields as zero/empty values and renamed enum values incorrectly without raising an exception."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "Database column dropped, causing SQL execution errors in revenue report."
+    }
+  ],
+  "migration_notes": "Orders v2 changes how an order's money, customer and payment state are represented across REST, gRPC, and DB. Consumers should ship tolerant readers that accept v1 and v2 simultaneously during the rollout period. REST clients should read total.amount_minor and customer.display_name when present while falling back to v1 fields. gRPC clients should vendor the v2 proto with deprecated old fields. SQL reports must check alembic_version to query either total_price or total_minor."
+}
