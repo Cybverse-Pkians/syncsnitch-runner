@@ -1,0 +1,355 @@
+{
+  "run_id": "w-20260927-071446-0549",
+  "mapping": [
+    {
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "rest:Order.customer:property_added",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "grpc:orders.OrderSummary.5:field_added",
+        "db:orders.customer_name:column_renamed",
+        "db:orders.customer_id:column_added"
+      ],
+      "old": "customer_name",
+      "new": "customer",
+      "rule": "Replace flat customer name string with structured customer model containing ID and display name"
+    },
+    {
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "rest:Order.total:property_added",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "grpc:orders.OrderSummary.6:field_added",
+        "db:orders.total_price:column_dropped",
+        "db:orders.total_minor:column_added",
+        "db:orders.currency:column_added"
+      ],
+      "old": "total_price",
+      "new": "total",
+      "rule": "Move major-unit decimal price to structured minor-unit money"
+    },
+    {
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "rest:OrderStatus.AWAITING_PAYMENT:enum_value_added",
+        "grpc:orders.OrderStatus.1:enum_value_renamed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "Rename PENDING state to AWAITING_PAYMENT to clear up state misunderstandings"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "OrderDTO",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Replace field with structured customer field or conditional logic to read customer.display_name"
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "OrderDTO",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Replace field with structured total field or conditional logic to read total.amount_minor"
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "revenue.sql",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Update SQL query to SUM(total_minor) instead of SUM(total_price)"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "NOT_PAYABLE",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Add 'AWAITING_PAYMENT' to NOT_PAYABLE set to prevent invoicing unpaid orders"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Use total.amount_minor/100 or total_price conditionally based on available fields"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Use total.amount_minor/100 or total_price conditionally based on available fields"
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "build_invoice",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Use customer.display_name or customer_name conditionally based on available fields"
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "status_from_summary",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Read total.amount_minor when HasField('total') is true, otherwise use fallback logic"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "grpc:orders.OrderStatus.1:enum_value_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Regenerate gRPC Python stubs from the updated orders.proto contract"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Regenerate gRPC Python stubs from the updated orders.proto contract"
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "orders.proto",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Regenerate gRPC Python stubs from the updated orders.proto contract"
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 3,
+      "symbol": "order_paid.json",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture structure to match REST Order v2 schema"
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 4,
+      "symbol": "order_paid.json",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture structure to match REST Order v2 schema"
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 3,
+      "symbol": "order_unpaid.json",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture structure to match REST Order v2 schema"
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 4,
+      "symbol": "order_unpaid.json",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture structure to match REST Order v2 schema"
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 5,
+      "symbol": "order_unpaid.json",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test fixture status to AWAITING_PAYMENT"
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 10,
+      "symbol": "test_paid_order_summary",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test instantiation of OrderSummary to use nested customer model"
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 11,
+      "symbol": "test_paid_order_summary",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test instantiation of OrderSummary to use nested total model"
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 11,
+      "symbol": "ROWS",
+      "change_ids": [
+        "rest:OrderStatus.PENDING:enum_value_removed",
+        "db:orders.status.PENDING:value_renamed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update mock table data value PENDING to AWAITING_PAYMENT"
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "db_url",
+      "change_ids": [
+        "rest:Order.customer_name:property_removed",
+        "grpc:orders.OrderSummary.2:field_removed",
+        "db:orders.customer_name:column_renamed"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update table creation schema to use customer_display_name instead of customer_name"
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "db_url",
+      "change_ids": [
+        "rest:Order.total_price:property_removed",
+        "grpc:orders.OrderSummary.3:field_removed",
+        "db:orders.total_price:column_dropped"
+      ],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update table creation schema to use total_minor instead of total_price"
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "The API validation expects customer_name and total_price on the REST payload, but they have been removed upstream in v2, resulting in a ValidationError (HTTP 500). If this loud error is resolved, the status check will silently fail and invoice unpaid orders because PENDING was renamed to AWAITING_PAYMENT, which is missing from NOT_PAYABLE."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "The gRPC OrderSummary payload removed total_price (field 3). Old compiled clients read the missing field as the default value 0.0 with no error, silently evaluating amount_minor as 0."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "Database migration 0002 drops the total_price column. Executing the query containing SUM(total_price) raises an OperationalError/DatabaseError (HTTP 500) because the column no longer exists."
+    }
+  ],
+  "migration_notes": "For REST, consumers should read total.amount_minor when present, else round(total_price * 100), and treat both PENDING and AWAITING_PAYMENT as 'not payable'. For gRPC, vendor the v2 proto but re-declare fields 2 and 3 as deprecated in your copy, so one set of stubs can read both server versions, preferring total/customer when HasField is true. For SQL, consumers should check alembic_version.version_num and use SUM(total_price) for 0001 and SUM(total_minor) for 0002. This rollout plan allows consumers to ship tolerant readers that accept v1 and v2 at the same time."
+}

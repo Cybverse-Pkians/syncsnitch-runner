@@ -1,0 +1,52 @@
+{
+  "run_id": "w-20260927-071446-0549",
+  "consumer_sha": "b22fe64a17c4050a443b7b22167488e622a90d16",
+  "upstream": {
+    "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+    "head_sha": "61f6af0fb96b0241d60fd011ee4a2ece10439a1f"
+  },
+  "checks": [
+    {
+      "id": "V1",
+      "name": "consumer unit tests",
+      "status": "pass",
+      "details": "9 passed, 1 skipped, 1 warning in 0.45s"
+    },
+    {
+      "id": "V2",
+      "name": "v2 fixtures match the new contract",
+      "status": "pass",
+      "details": "3 v2 fixtures match schema"
+    },
+    {
+      "id": "V3",
+      "name": "consumer vs upstream v1 (backward compatible)",
+      "status": "pass",
+      "details": "5/5 passed"
+    },
+    {
+      "id": "V4",
+      "name": "consumer vs upstream v2 (new contract)",
+      "status": "pass",
+      "details": "5/5 passed"
+    },
+    {
+      "id": "V5",
+      "name": "Prism contract examples",
+      "status": "pass",
+      "details": "test_rest_contract_examples_parse passed against v1 and v2"
+    },
+    {
+      "id": "V6",
+      "name": "diff scope",
+      "status": "pass",
+      "details": "16 files changed within scope"
+    }
+  ],
+  "summary": {
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "verdict": "green"
+  }
+}
