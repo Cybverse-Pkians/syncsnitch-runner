@@ -1,0 +1,281 @@
+{
+  "run_id": "w-20260928-140525-10e7",
+  "upstream": {
+    "repo": "kshiti26-11/demo",
+    "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+    "head": "main",
+    "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+    "head_sha": "0d5925565a38a672f8e849ea0eaa0eaba88aad8e"
+  },
+  "changes": [
+    {
+      "id": "rest:Money:schema_added",
+      "surface": "rest",
+      "kind": "schema_added",
+      "location": "Money",
+      "old": null,
+      "new": "Money",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "rest:Customer:schema_added",
+      "surface": "rest",
+      "kind": "schema_added",
+      "location": "Customer",
+      "old": null,
+      "new": "Customer",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "rest:OrderStatus.PENDING:enum_value_removed",
+      "surface": "rest",
+      "kind": "enum_value_removed",
+      "location": "OrderStatus.PENDING",
+      "old": "PENDING",
+      "new": null,
+      "breaking": true,
+      "note": ""
+    },
+    {
+      "id": "rest:OrderStatus.AWAITING_PAYMENT:enum_value_added",
+      "surface": "rest",
+      "kind": "enum_value_added",
+      "location": "OrderStatus.AWAITING_PAYMENT",
+      "old": null,
+      "new": "AWAITING_PAYMENT",
+      "breaking": false,
+      "note": "consumers with exhaustive status handling may break"
+    },
+    {
+      "id": "rest:Order.customer_name:property_removed",
+      "surface": "rest",
+      "kind": "property_removed",
+      "location": "Order.customer_name",
+      "old": "customer_name",
+      "new": null,
+      "breaking": true,
+      "note": ""
+    },
+    {
+      "id": "rest:Order.total_price:property_removed",
+      "surface": "rest",
+      "kind": "property_removed",
+      "location": "Order.total_price",
+      "old": "total_price",
+      "new": null,
+      "breaking": true,
+      "note": ""
+    },
+    {
+      "id": "rest:Order.customer:property_added",
+      "surface": "rest",
+      "kind": "property_added",
+      "location": "Order.customer",
+      "old": null,
+      "new": "customer",
+      "breaking": false,
+      "note": "required property added"
+    },
+    {
+      "id": "rest:Order.total:property_added",
+      "surface": "rest",
+      "kind": "property_added",
+      "location": "Order.total",
+      "old": null,
+      "new": "total",
+      "breaking": false,
+      "note": "required property added"
+    },
+    {
+      "id": "rest:Order.shipping_eta:property_added",
+      "surface": "rest",
+      "kind": "property_added",
+      "location": "Order.shipping_eta",
+      "old": null,
+      "new": "shipping_eta",
+      "breaking": false,
+      "note": "optional property added"
+    },
+    {
+      "id": "grpc:orders.Customer:message_added",
+      "surface": "grpc",
+      "kind": "message_added",
+      "location": "orders.Customer",
+      "old": null,
+      "new": "orders.Customer",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "grpc:orders.Money:message_added",
+      "surface": "grpc",
+      "kind": "message_added",
+      "location": "orders.Money",
+      "old": null,
+      "new": "orders.Money",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "grpc:orders.OrderStatus.1:enum_value_renamed",
+      "surface": "grpc",
+      "kind": "enum_value_renamed",
+      "location": "orders.OrderStatus.1",
+      "old": "ORDER_STATUS_PENDING",
+      "new": "ORDER_STATUS_AWAITING_PAYMENT",
+      "breaking": true,
+      "note": "wire-compatible, source-breaking"
+    },
+    {
+      "id": "grpc:orders.OrderSummary.2:field_removed",
+      "surface": "grpc",
+      "kind": "field_removed",
+      "location": "orders.OrderSummary.2",
+      "old": "customer_name",
+      "new": null,
+      "breaking": true,
+      "note": ""
+    },
+    {
+      "id": "grpc:orders.OrderSummary.3:field_removed",
+      "surface": "grpc",
+      "kind": "field_removed",
+      "location": "orders.OrderSummary.3",
+      "old": "total_price",
+      "new": null,
+      "breaking": true,
+      "note": ""
+    },
+    {
+      "id": "grpc:orders.OrderSummary.5:field_added",
+      "surface": "grpc",
+      "kind": "field_added",
+      "location": "orders.OrderSummary.5",
+      "old": null,
+      "new": "customer",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "grpc:orders.OrderSummary.6:field_added",
+      "surface": "grpc",
+      "kind": "field_added",
+      "location": "orders.OrderSummary.6",
+      "old": null,
+      "new": "total",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "grpc:orders.OrderSummary.7:field_added",
+      "surface": "grpc",
+      "kind": "field_added",
+      "location": "orders.OrderSummary.7",
+      "old": null,
+      "new": "shipping_eta",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "db:orders.total_minor:column_added",
+      "surface": "db",
+      "kind": "column_added",
+      "location": "orders.total_minor",
+      "old": null,
+      "new": "total_minor",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "db:orders.currency:column_added",
+      "surface": "db",
+      "kind": "column_added",
+      "location": "orders.currency",
+      "old": null,
+      "new": "currency",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "db:orders.customer_id:column_added",
+      "surface": "db",
+      "kind": "column_added",
+      "location": "orders.customer_id",
+      "old": null,
+      "new": "customer_id",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "db:orders.shipping_eta:column_added",
+      "surface": "db",
+      "kind": "column_added",
+      "location": "orders.shipping_eta",
+      "old": null,
+      "new": "shipping_eta",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "db:orders.customer_name:column_renamed",
+      "surface": "db",
+      "kind": "column_renamed",
+      "location": "orders.customer_name",
+      "old": "customer_name",
+      "new": "customer_display_name",
+      "breaking": true,
+      "note": ""
+    },
+    {
+      "id": "db:0002_money_customer_status.py:39:data_update",
+      "surface": "db",
+      "kind": "data_update",
+      "location": "0002_money_customer_status.py:39",
+      "old": null,
+      "new": "UPDATE orders SET total_minor = CAST(ROUND(total_price * 100) AS BIGINT)",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "db:0002_money_customer_status.py:40:data_update",
+      "surface": "db",
+      "kind": "data_update",
+      "location": "0002_money_customer_status.py:40",
+      "old": null,
+      "new": "UPDATE orders SET customer_id = 'c-' || SUBSTR(order_id, 3)",
+      "breaking": false,
+      "note": ""
+    },
+    {
+      "id": "db:orders.status.PENDING:value_renamed",
+      "surface": "db",
+      "kind": "value_renamed",
+      "location": "orders.status.PENDING",
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "breaking": true,
+      "note": ""
+    },
+    {
+      "id": "db:orders.total_price:column_dropped",
+      "surface": "db",
+      "kind": "column_dropped",
+      "location": "orders.total_price",
+      "old": "total_price",
+      "new": null,
+      "breaking": true,
+      "note": ""
+    }
+  ],
+  "summary": {
+    "total": 26,
+    "breaking": 9,
+    "by_surface": {
+      "rest": 9,
+      "grpc": 8,
+      "db": 9
+    }
+  }
+}

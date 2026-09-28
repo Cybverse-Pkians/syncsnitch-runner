@@ -1,0 +1,65 @@
+{
+  "run_id": "w-20260928-140525-10e7",
+  "link": "https://github.com/kshiti26-11/demo",
+  "repo": "kshiti26-11/demo",
+  "status": "traced",
+  "created_at": "2026-09-28T14:06:15+00:00",
+  "site_url": "https://demo-smoky-six-28.vercel.app",
+  "overrides": {
+    "upstream": "orders-service",
+    "consumer": "billing-service",
+    "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+    "head": "main"
+  },
+  "traced_at": "2026-09-28T14:06:17.445+00:00",
+  "upstream": "orders-service",
+  "consumer": "billing-service",
+  "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head": "main",
+  "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head_sha": "0d5925565a38a672f8e849ea0eaa0eaba88aad8e",
+  "default_branch": "main",
+  "summary": {
+    "total": 26,
+    "breaking": 9,
+    "by_surface": {
+      "rest": 3,
+      "grpc": 3,
+      "db": 3
+    },
+    "files": 9,
+    "endpoints": [
+      "GET /payments/{order_id}/status",
+      "GET /reports/revenue",
+      "POST /invoices/{order_id}"
+    ]
+  },
+  "hits": 21,
+  "bob_command": "/syncsnitch https://demo-smoky-six-28.vercel.app/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main&run=w-20260928-140525-10e7",
+  "analyze_url": "/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main",
+  "runner": {
+    "state": "failed",
+    "problems": [],
+    "error": "the Tracer did not produce impact.json (Gemini API 503: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.)",
+    "backend": "gemini",
+    "label": "Gemini",
+    "model": "gemini-3.5-flash-lite",
+    "unit": "tokens",
+    "budget": 3000000.0,
+    "docker": true,
+    "started_at": "2026-09-28T14:06:17+00:00",
+    "updated_at": "2026-09-28T14:08:25.493+00:00",
+    "agents": {
+      "tracer": "failed"
+    },
+    "stages": {
+      "tracer": "failed"
+    },
+    "spent": {
+      "tracer": 0.0
+    },
+    "tasks": {
+      "tracer": null
+    }
+  }
+}
