@@ -1,0 +1,490 @@
+{
+ "run_id": "w-20260928-135852-bb6d",
+ "phase": "failed",
+ "spec": {
+  "link": "https://github.com/kshiti26-11/demo",
+  "repo": "kshiti26-11/demo",
+  "upstream": "orders-service",
+  "consumer": "billing-service",
+  "base": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "base_sha": "15f95af008e5060450fa81ff0a58ed50627b1b2e",
+  "head": "main",
+  "created_at": "2026-09-28T13:59:11+00:00",
+  "error": null,
+  "bob_command": "/syncsnitch https://demo-smoky-six-28.vercel.app/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main&run=w-20260928-135852-bb6d",
+  "analyze_url": "/analyze?repo=kshiti26-11%2Fdemo&upstream=orders-service&consumer=billing-service&base=15f95af008e5&head=main"
+ },
+ "tracer": {
+  "status": "failed",
+  "breaking": 9,
+  "surfaces": [
+   "REST",
+   "gRPC",
+   "DB"
+  ],
+  "hits": 21,
+  "by_surface": {
+   "rest": 3,
+   "grpc": 3,
+   "db": 3
+  },
+  "files": 9,
+  "endpoints": [
+   "GET /payments/{order_id}/status",
+   "GET /reports/revenue",
+   "POST /invoices/{order_id}"
+  ],
+  "classified": false,
+  "loud": 0,
+  "silent": 0,
+  "failures": {},
+  "silent_why": ""
+ },
+ "transformer": {
+  "status": "waiting",
+  "branch": "syncsnitch/w-20260928-135852-bb6d",
+  "files": 0,
+  "insertions": 0,
+  "deletions": 0,
+  "uncommitted": 0,
+  "commits": 0,
+  "unit_tests": null
+ },
+ "verifier": {
+  "status": "waiting",
+  "checks": [
+   {
+    "id": "V1",
+    "status": "waiting",
+    "details": ""
+   },
+   {
+    "id": "V2",
+    "status": "waiting",
+    "details": ""
+   },
+   {
+    "id": "V3",
+    "status": "waiting",
+    "details": ""
+   },
+   {
+    "id": "V4",
+    "status": "waiting",
+    "details": ""
+   },
+   {
+    "id": "V5",
+    "status": "waiting",
+    "details": ""
+   },
+   {
+    "id": "V6",
+    "status": "waiting",
+    "details": ""
+   }
+  ],
+  "verdict": null,
+  "source": null
+ },
+ "actions": null,
+ "companion_pr_url": null,
+ "replay_url": null,
+ "diff_available": false,
+ "diff_key": "0:0:0:False",
+ "runner": {
+  "state": "failed",
+  "backend": "gemini",
+  "label": "Gemini",
+  "model": "gemini-3.5-flash",
+  "unit": "tokens",
+  "budget": 3000000.0,
+  "spent": 0.0,
+  "spent_by": {
+   "tracer": 0.0
+  },
+  "tasks": {},
+  "docker": true,
+  "error": "the Tracer did not produce impact.json (Gemini API 503: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.)",
+  "verdict": null,
+  "problems": [],
+  "can_approve": false,
+  "can_reject": false,
+  "can_start": true
+ },
+ "events": [
+  {
+   "ts": "2026-09-28T13:59:11.049+00:00",
+   "step": "S0",
+   "agent": "site",
+   "level": "info",
+   "msg": "Target received: https://github.com/kshiti26-11/demo",
+   "key": "e0"
+  },
+  {
+   "ts": "2026-09-28T13:59:11.049+00:00",
+   "step": "S0",
+   "agent": "site",
+   "level": "info",
+   "msg": "Orchestrating: S1-S2 engine -> S3 Tracer -> S4 Transformer -> S5 verify -> S6 Verifier (AI agents) -> S7 human gate -> S8 draft PR -> S9 artifact",
+   "key": "e1"
+  },
+  {
+   "ts": "2026-09-28T13:59:11.123+00:00",
+   "step": "S0",
+   "agent": "site",
+   "level": "info",
+   "msg": "Resolving kshiti26-11/demo on GitHub (branches, contract folders, history)",
+   "key": "e2"
+  },
+  {
+   "ts": "2026-09-28T13:59:12.484+00:00",
+   "step": "S0",
+   "agent": "site",
+   "level": "ok",
+   "msg": "Upstream orders-service (contract owner) -> consumer billing-service; base 15f95af008e5 (feat: orders-service v1 (REST + gRPC + DB contract)) -> head main",
+   "key": "e3"
+  },
+  {
+   "ts": "2026-09-28T13:59:13.578+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "info",
+   "msg": "S1 detect: fetching 2 contract file(s) at 15f95af and 0d59255, 1 new migration(s)",
+   "key": "e4"
+  },
+  {
+   "ts": "2026-09-28T13:59:14.486+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "warn",
+   "msg": "REST (OpenAPI): 3 breaking - enum_value_removed OrderStatus.PENDING, property_removed Order.customer_name, property_removed Order.total_price",
+   "key": "e5"
+  },
+  {
+   "ts": "2026-09-28T13:59:14.486+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "warn",
+   "msg": "gRPC (protobuf): 3 breaking - enum_value_renamed orders.OrderStatus.1, field_removed orders.OrderSummary.2, field_removed orders.OrderSummary.3",
+   "key": "e6"
+  },
+  {
+   "ts": "2026-09-28T13:59:14.486+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "warn",
+   "msg": "DB (Alembic): 3 breaking - column_renamed orders.customer_name, value_renamed orders.status.PENDING, column_dropped orders.total_price",
+   "key": "e7"
+  },
+  {
+   "ts": "2026-09-28T13:59:14.487+00:00",
+   "step": "S1",
+   "agent": "engine",
+   "level": "ok",
+   "msg": "S1 detect: 9 breaking of 26 changes (REST 3, gRPC 3, DB 3)",
+   "key": "e8"
+  },
+  {
+   "ts": "2026-09-28T13:59:14.487+00:00",
+   "step": "S2",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "S2 trace: AST + SQL + proto + fixture scan of 29 consumer files in billing-service",
+   "key": "e9"
+  },
+  {
+   "ts": "2026-09-28T13:59:14.509+00:00",
+   "step": "S2",
+   "agent": "tracer",
+   "level": "ok",
+   "msg": "S2 trace: 21 usages in 9 files -> GET /payments/{order_id}/status, GET /reports/revenue, POST /invoices/{order_id}",
+   "key": "e10"
+  },
+  {
+   "ts": "2026-09-28T13:59:15.981+00:00",
+   "step": "S2",
+   "agent": "site",
+   "level": "ok",
+   "msg": "S1-S2 done: starting the 3 agents on Gemini (gemini-3.5-flash) - Tracer -> Transformer -> Verifier, no IDE step needed",
+   "key": "e11"
+  },
+  {
+   "ts": "2026-09-28T13:59:15.983+00:00",
+   "step": "S2",
+   "agent": "engine",
+   "level": "info",
+   "msg": "Preparing the agents' workspace: cloning kshiti26-11/demo into .syncsnitch/work/w-20260928-135852-bb6d",
+   "key": "e12"
+  },
+  {
+   "ts": "2026-09-28T13:59:19.124+00:00",
+   "step": "S2",
+   "agent": "engine",
+   "level": "ok",
+   "msg": "Workspace ready: branch syncsnitch/w-20260928-135852-bb6d from main (0d5925565a38); upstream orders-service is read-only",
+   "key": "e13"
+  },
+  {
+   "ts": "2026-09-28T13:59:19.128+00:00",
+   "step": "S2",
+   "agent": "engine",
+   "level": "info",
+   "msg": "Upstream change proposal found: orders-service/docs/orders-v2-change-proposal.docx (the Tracer reads it)",
+   "key": "e14"
+  },
+  {
+   "ts": "2026-09-28T13:59:19.129+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Tracer started: classifying every traced usage as loud or silent",
+   "key": "e15"
+  },
+  {
+   "ts": "2026-09-28T13:59:19.133+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Gemini (gemini-3.5-flash) \u00b7 agent syncsnitch-tracer \u00b7 budget 900,000 tokens",
+   "src": "gemini",
+   "key": "e16"
+  },
+  {
+   "ts": "2026-09-28T13:59:42.585+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash is overloaded right now, switching to gemini-3.7-flash",
+   "src": "gemini",
+   "key": "e17"
+  },
+  {
+   "ts": "2026-09-28T14:00:25.151+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.7-flash is overloaded right now, switching to gemini-3.6-flash",
+   "src": "gemini",
+   "key": "e18"
+  },
+  {
+   "ts": "2026-09-28T14:00:56.662+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.6-flash is overloaded right now, switching to gemini-3.5-flash-lite",
+   "src": "gemini",
+   "key": "e19"
+  },
+  {
+   "ts": "2026-09-28T14:01:13.095+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash-lite is overloaded right now, switching to gemini-3.5-flash",
+   "src": "gemini",
+   "key": "e20"
+  },
+  {
+   "ts": "2026-09-28T14:01:28.435+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash is overloaded right now, switching to gemini-3.7-flash",
+   "src": "gemini",
+   "key": "e21"
+  },
+  {
+   "ts": "2026-09-28T14:01:42.567+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.7-flash is overloaded right now, switching to gemini-3.6-flash",
+   "src": "gemini",
+   "key": "e22"
+  },
+  {
+   "ts": "2026-09-28T14:01:55.260+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.6-flash is overloaded right now, switching to gemini-3.5-flash-lite",
+   "src": "gemini",
+   "key": "e23"
+  },
+  {
+   "ts": "2026-09-28T14:02:06.911+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash-lite is overloaded right now, switching to gemini-3.5-flash",
+   "src": "gemini",
+   "key": "e24"
+  },
+  {
+   "ts": "2026-09-28T14:02:26.316+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "error",
+   "msg": "Gemini API 503: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+   "src": "gemini",
+   "key": "e25"
+  },
+  {
+   "ts": "2026-09-28T14:02:26.316+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "Gemini session finished: 0 tool calls \u00b7 0 turns \u00b7 0 tokens \u00b7 3m 07s \u00b7 gemini-3.5-flash",
+   "src": "gemini",
+   "key": "e26"
+  },
+  {
+   "ts": "2026-09-28T14:02:26.318+00:00",
+   "step": "S3",
+   "agent": "site",
+   "level": "error",
+   "msg": "Run stopped: the Tracer did not produce impact.json (Gemini API 503: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.). Fix it and press Resume agents",
+   "key": "e27"
+  },
+  {
+   "ts": "2026-09-28T14:03:17.138+00:00",
+   "step": "S2",
+   "agent": "engine",
+   "level": "info",
+   "msg": "Preparing the agents' workspace: cloning kshiti26-11/demo into .syncsnitch/work/w-20260928-135852-bb6d",
+   "key": "e28"
+  },
+  {
+   "ts": "2026-09-28T14:03:18.969+00:00",
+   "step": "S2",
+   "agent": "engine",
+   "level": "ok",
+   "msg": "Workspace ready: branch syncsnitch/w-20260928-135852-bb6d from main (0d5925565a38); upstream orders-service is read-only",
+   "key": "e29"
+  },
+  {
+   "ts": "2026-09-28T14:03:18.970+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Tracer started: classifying every traced usage as loud or silent",
+   "key": "e30"
+  },
+  {
+   "ts": "2026-09-28T14:03:18.993+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "info",
+   "msg": "Gemini (gemini-3.5-flash) \u00b7 agent syncsnitch-tracer \u00b7 budget 900,000 tokens",
+   "src": "gemini",
+   "key": "e31"
+  },
+  {
+   "ts": "2026-09-28T14:03:31.488+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash is overloaded right now, switching to gemini-3.7-flash",
+   "src": "gemini",
+   "key": "e32"
+  },
+  {
+   "ts": "2026-09-28T14:03:46.764+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.7-flash is overloaded right now, switching to gemini-3.6-flash",
+   "src": "gemini",
+   "key": "e33"
+  },
+  {
+   "ts": "2026-09-28T14:03:58.522+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.6-flash is overloaded right now, switching to gemini-3.5-flash-lite",
+   "src": "gemini",
+   "key": "e34"
+  },
+  {
+   "ts": "2026-09-28T14:04:11.407+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash-lite is overloaded right now, switching to gemini-3.5-flash",
+   "src": "gemini",
+   "key": "e35"
+  },
+  {
+   "ts": "2026-09-28T14:04:25.340+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash is overloaded right now, switching to gemini-3.7-flash",
+   "src": "gemini",
+   "key": "e36"
+  },
+  {
+   "ts": "2026-09-28T14:04:37.430+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.7-flash is overloaded right now, switching to gemini-3.6-flash",
+   "src": "gemini",
+   "key": "e37"
+  },
+  {
+   "ts": "2026-09-28T14:05:21.943+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.6-flash is overloaded right now, switching to gemini-3.5-flash-lite",
+   "src": "gemini",
+   "key": "e38"
+  },
+  {
+   "ts": "2026-09-28T14:05:34.439+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "gemini-3.5-flash-lite is overloaded right now, switching to gemini-3.5-flash",
+   "src": "gemini",
+   "key": "e39"
+  },
+  {
+   "ts": "2026-09-28T14:05:45.252+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "error",
+   "msg": "Gemini API 503: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+   "src": "gemini",
+   "key": "e40"
+  },
+  {
+   "ts": "2026-09-28T14:05:45.252+00:00",
+   "step": "S3",
+   "agent": "tracer",
+   "level": "warn",
+   "msg": "Gemini session finished: 0 tool calls \u00b7 0 turns \u00b7 0 tokens \u00b7 2m 26s \u00b7 gemini-3.5-flash",
+   "src": "gemini",
+   "key": "e41"
+  },
+  {
+   "ts": "2026-09-28T14:05:45.254+00:00",
+   "step": "S3",
+   "agent": "site",
+   "level": "error",
+   "msg": "Run stopped: the Tracer did not produce impact.json (Gemini API 503: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.). Fix it and press Resume agents",
+   "key": "e42"
+  }
+ ],
+ "cloud": {
+  "job": "36433039116",
+  "mode": "agents",
+  "html_url": "https://github.com/Cybverse-Pkians/syncsnitch-runner/actions/runs/36433039116",
+  "runner_repo": "Cybverse-Pkians/syncsnitch-runner",
+  "snapshot_at": "2026-09-28T14:05:47Z"
+ }
+}
