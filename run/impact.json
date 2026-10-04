@@ -1,0 +1,256 @@
+{
+  "run_id": "w-20261004-203249-a4d2",
+  "mapping": [
+    {
+      "change_ids": ["CH1"],
+      "old": "total_price",
+      "new": "total.amount_minor / total_minor",
+      "rule": "property_removed / field_removed / column_dropped"
+    },
+    {
+      "change_ids": ["CH2"],
+      "old": "customer_name",
+      "new": "customer.display_name / customer_display_name",
+      "rule": "property_removed / field_removed / column_renamed"
+    },
+    {
+      "change_ids": ["CH3"],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "enum_value_removed / enum_value_renamed / value_renamed"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Make field optional to support both versions, reading display_name if present."
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Make field optional to support both versions, reading total.amount_minor if present."
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Use conditional SQL checking migration version or coalesce to total_minor."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Add AWAITING_PAYMENT to NOT_PAYABLE set."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else fallback to total_price calculation."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor when present, else fallback to total_price calculation."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read customer.display_name when present, else fallback to customer_name."
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Vendor the v2 proto with deprecated fields 2 and 3, and prefer total if present."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "ORDER_STATUS_PENDING",
+      "change_ids": ["CH3"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update contract copy to use ORDER_STATUS_AWAITING_PAYMENT."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update proto file to match v2 structure."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update proto file to match v2 structure."
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 3,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture file with customer nested object."
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 4,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture file with total nested object."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 3,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture file with customer nested object."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 4,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture file with total nested object."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 5,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture status field to AWAITING_PAYMENT."
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 10,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test mocks and expected keywords to v2 structure."
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 11,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test mocks and expected keywords to v2 structure."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 11,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update dummy DB record status to AWAITING_PAYMENT."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update embedded DB setup script to use customer_display_name."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update embedded DB setup script to use total_minor."
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "Pydantic validation of OrderDTO fails because the expected fields total_price and customer_name are removed from the incoming REST payload."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "gRPC fields 2 (customer_name) and 3 (total_price) are removed. Reading total_price from the OrderSummary stub defaults silently to 0.0 without throwing errors."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "The database column total_price on the orders table is dropped, causing raw SQL execution on the table to fail with a DB error."
+    }
+  ],
+  "migration_notes": "Orders v2 introduces breaking changes across REST, gRPC, and DB surfaces for representing price, customer metadata, and status. It replaces float-based total_price with an integer minor units total, nesting customer name under a new customer object, and renames status PENDING to AWAITING_PAYMENT. The rollout plan specifies that consumers should ship tolerant clients supporting both v1 and v2 simultaneously before orders-service migrates. Old clients get no errors on gRPC removals but receive zeroed-out fields silently, while old REST and SQL-based implementations experience loud failures."
+}

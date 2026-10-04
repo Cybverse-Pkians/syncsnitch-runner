@@ -1,0 +1,530 @@
+# generated protobuf stubs (*_pb2*.py) are hidden
+diff --git a/billing-service/.syncsnitch.json b/billing-service/.syncsnitch.json
+new file mode 100644
+index 0000000..1a4fb78
+--- /dev/null
++++ b/billing-service/.syncsnitch.json
+@@ -0,0 +1 @@
++{"upstream_repo": "kshiti26-11/demo", "upstream_pr": null, "upstream_base": "15f95af008e5060450fa81ff0a58ed50627b1b2e", "upstream_head": "400553138e91c6942210b414286e39e4f47048bb", "run_id": "w-20261004-203249-a4d2"}
+\ No newline at end of file
+diff --git a/billing-service/billing/adapters/__init__.py b/billing-service/billing/adapters/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/billing-service/billing/adapters/orders_contract.py b/billing-service/billing/adapters/orders_contract.py
+new file mode 100644
+index 0000000..726e967
+--- /dev/null
++++ b/billing-service/billing/adapters/orders_contract.py
+@@ -0,0 +1,87 @@
++from dataclasses import dataclass
++from datetime import datetime
++from decimal import Decimal, ROUND_HALF_UP
++
++
++def normalize_status(value: str) -> str:
++    if value.startswith("ORDER_STATUS_"):
++        value = value[len("ORDER_STATUS_"):]
++    if value == "PENDING":
++        return "AWAITING_PAYMENT"
++    return value
++
++
++def _round_half_up(d: Decimal) -> int:
++    return int(d.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
++
++
++@dataclass(frozen=True)
++class OrderView:
++    order_id: str
++    customer_name: str
++    amount_minor: int
++    currency: str
++    status: str
++    created_at: datetime | None = None
++
++
++def from_rest(payload: dict) -> OrderView:
++    order_id = payload["order_id"]
++    status = normalize_status(payload["status"])
++    created_at_raw = payload.get("created_at")
++    created_at = None
++    if created_at_raw:
++        if isinstance(created_at_raw, str):
++            created_at = datetime.fromisoformat(created_at_raw.replace("Z", "+00:00"))
++        else:
++            created_at = created_at_raw
++
++    if "customer" in payload and payload["customer"] and "display_name" in payload["customer"]:
++        customer_name = payload["customer"]["display_name"]
++    else:
++        customer_name = payload["customer_name"]
++
++    if "total" in payload and payload["total"] and "amount_minor" in payload["total"]:
++        amount_minor = int(payload["total"]["amount_minor"])
++        currency = payload["total"].get("currency", "USD")
++    else:
++        total_price = payload["total_price"]
++        amount_minor = _round_half_up(Decimal(str(total_price)) * 100)
++        currency = "USD"
++
++    return OrderView(
++        order_id=order_id,
++        customer_name=customer_name,
++        amount_minor=amount_minor,
++        currency=currency,
++        status=status,
++        created_at=created_at,
++    )
++
++
++def from_summary(summary) -> OrderView:
++    order_id = summary.order_id
++
++    status_field = type(summary).DESCRIPTOR.fields_by_name["status"]
++    status_name = status_field.enum_type.values_by_number[summary.status].name
++    status = normalize_status(status_name)
++
++    if summary.HasField("customer"):
++        customer_name = summary.customer.display_name
++    else:
++        customer_name = summary.customer_name
++
++    if summary.HasField("total"):
++        amount_minor = summary.total.amount_minor
++        currency = summary.total.currency or "USD"
++    else:
++        amount_minor = _round_half_up(Decimal(str(summary.total_price)) * 100)
++        currency = "USD"
++
++    return OrderView(
++        order_id=order_id,
++        customer_name=customer_name,
++        amount_minor=amount_minor,
++        currency=currency,
++        status=status,
++    )
+diff --git a/billing-service/billing/contract_entrypoints.py b/billing-service/billing/contract_entrypoints.py
+index 2822e7c..4e071de 100644
+--- a/billing-service/billing/contract_entrypoints.py
++++ b/billing-service/billing/contract_entrypoints.py
+@@ -1,6 +1,6 @@
+-from .models.order import OrderDTO
++from .adapters.orders_contract import from_rest
+ from .services.invoice import build_invoice
+ 
+ 
+ def invoice_from_order_payload(payload: dict) -> dict | None:
+-    return build_invoice(OrderDTO.model_validate(payload))
++    return build_invoice(from_rest(payload))
+diff --git a/billing-service/billing/models/order.py b/billing-service/billing/models/order.py
+index 6af3477..33a95ce 100644
+--- a/billing-service/billing/models/order.py
++++ b/billing-service/billing/models/order.py
+@@ -1,10 +1,23 @@
+ from datetime import datetime
++from typing import Optional
+ from pydantic import BaseModel
+ 
+ 
++class CustomerDTO(BaseModel):
++    customer_id: Optional[str] = None
++    display_name: str
++
++
++class MoneyDTO(BaseModel):
++    amount_minor: int
++    currency: Optional[str] = "USD"
++
++
+ class OrderDTO(BaseModel):
+     order_id: str
+-    customer_name: str
+-    total_price: float
++    customer_name: Optional[str] = None
++    total_price: Optional[float] = None
+     status: str
+     created_at: datetime
++    customer: Optional[CustomerDTO] = None
++    total: Optional[MoneyDTO] = None
+diff --git a/billing-service/billing/reports/revenue.py b/billing-service/billing/reports/revenue.py
+index dc50557..7dd1c3b 100644
+--- a/billing-service/billing/reports/revenue.py
++++ b/billing-service/billing/reports/revenue.py
+@@ -3,26 +3,43 @@ from pathlib import Path
+ 
+ from sqlalchemy import create_engine, text
+ 
+-
+-_SQL = (Path(__file__).parent / "revenue.sql").read_text()
++_SQL_V1 = (Path(__file__).parent / "revenue_v1.sql").read_text()
++_SQL_V2 = (Path(__file__).parent / "revenue_v2.sql").read_text()
+ 
+ 
+ def _round_half_up(d: Decimal) -> int:
+     return int(d.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+ 
+ 
++def _schema_version(conn) -> str:
++    try:
++        return str(conn.execute(text("SELECT version_num FROM alembic_version")).scalar() or "")
++    except Exception:
++        conn.rollback()
++        return ""
++
++
+ def run_revenue_report(db_url: str) -> list[dict]:
+     engine = create_engine(db_url)
+     try:
+         with engine.connect() as conn:
+-            rows = conn.execute(text(_SQL)).fetchall()
++            if _schema_version(conn) >= "0002":
++                rows = conn.execute(text(_SQL_V2)).fetchall()
++                return [
++                    {
++                        "day": str(row.day)[:10],
++                        "revenue_minor": int(row.revenue or 0),
++                    }
++                    for row in rows
++                ]
++            else:
++                rows = conn.execute(text(_SQL_V1)).fetchall()
++                return [
++                    {
++                        "day": str(row.day)[:10],
++                        "revenue_minor": _round_half_up(Decimal(str(row.revenue or 0)) * 100),
++                    }
++                    for row in rows
++                ]
+     finally:
+         engine.dispose()
+-
+-    return [
+-        {
+-            "day": str(row.day)[:10],
+-            "revenue_minor": _round_half_up(Decimal(str(row.revenue)) * 100),
+-        }
+-        for row in rows
+-    ]
+diff --git a/billing-service/billing/reports/revenue.sql b/billing-service/billing/reports/revenue_v1.sql
+similarity index 100%
+rename from billing-service/billing/reports/revenue.sql
+rename to billing-service/billing/reports/revenue_v1.sql
+diff --git a/billing-service/billing/reports/revenue_v2.sql b/billing-service/billing/reports/revenue_v2.sql
+new file mode 100644
+index 0000000..6d086e5
+--- /dev/null
++++ b/billing-service/billing/reports/revenue_v2.sql
+@@ -0,0 +1,2 @@
++SELECT date(created_at) AS day, SUM(total_minor) AS revenue FROM orders
++WHERE status IN ('PAID', 'SHIPPED') GROUP BY day ORDER BY day
+diff --git a/billing-service/billing/services/invoice.py b/billing-service/billing/services/invoice.py
+index 61a0c87..c0d3170 100644
+--- a/billing-service/billing/services/invoice.py
++++ b/billing-service/billing/services/invoice.py
+@@ -1,7 +1,7 @@
+ from decimal import Decimal, ROUND_HALF_UP
+ 
+ TAX_RATE = Decimal("0.0825")
+-NOT_PAYABLE = {"PENDING", "CANCELLED"}
++NOT_PAYABLE = {"AWAITING_PAYMENT", "CANCELLED"}
+ 
+ 
+ def _round_half_up(d: Decimal) -> int:
+@@ -12,8 +12,8 @@ def build_invoice(order) -> dict | None:
+     if order.status in NOT_PAYABLE:
+         return None
+ 
+-    subtotal = _round_half_up(Decimal(str(order.total_price)) * 100)
+-    tax = _round_half_up(Decimal(str(order.total_price)) * 100 * TAX_RATE)
++    subtotal = order.amount_minor
++    tax = _round_half_up(Decimal(str(order.amount_minor)) * TAX_RATE)
+     total = subtotal + tax
+ 
+     return {
+@@ -22,5 +22,5 @@ def build_invoice(order) -> dict | None:
+         "subtotal_minor": subtotal,
+         "tax_minor": tax,
+         "total_minor": total,
+-        "currency": "USD",
++        "currency": order.currency,
+     }
+diff --git a/billing-service/billing/services/payments.py b/billing-service/billing/services/payments.py
+index f04306f..18af444 100644
+--- a/billing-service/billing/services/payments.py
++++ b/billing-service/billing/services/payments.py
+@@ -1,21 +1,14 @@
+-from decimal import Decimal, ROUND_HALF_UP
++from ..adapters.orders_contract import from_summary
+ 
+-PAID_STATES = {"ORDER_STATUS_PAID", "ORDER_STATUS_SHIPPED"}
+-
+-
+-def _round_half_up(d: Decimal) -> int:
+-    return int(d.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
++PAID_STATES = {"PAID", "SHIPPED"}
+ 
+ 
+ def status_from_summary(summary) -> dict:
+-    field = type(summary).DESCRIPTOR.fields_by_name["status"]
+-    status_name = field.enum_type.values_by_number[summary.status].name
+-
+-    amount_minor = _round_half_up(Decimal(str(summary.total_price)) * 100)
++    view = from_summary(summary)
+ 
+     return {
+-        "order_id": summary.order_id,
+-        "paid": status_name in PAID_STATES,
+-        "amount_minor": amount_minor,
+-        "currency": "USD",
++        "order_id": view.order_id,
++        "paid": view.status in PAID_STATES,
++        "amount_minor": view.amount_minor,
++        "currency": view.currency,
+     }
+diff --git a/billing-service/contracts/upstream/orders.proto b/billing-service/contracts/upstream/orders.proto
+index cf6836e..6c3f525 100644
+--- a/billing-service/contracts/upstream/orders.proto
++++ b/billing-service/contracts/upstream/orders.proto
+@@ -1,4 +1,6 @@
+-// Orders gRPC contract v1 - owned by orders-service (upstream).
++// Orders gRPC contract v2 - owned by orders-service (upstream).
++// v2 = money in minor units, structured customer, PENDING renamed to
++// AWAITING_PAYMENT (same wire number), optional shipping_eta.
+ // Reference copy for SyncSnitch - do not edit.
+ syntax = "proto3";
+ 
+@@ -15,15 +17,28 @@ message GetOrderSummaryRequest {
+ 
+ enum OrderStatus {
+   ORDER_STATUS_UNSPECIFIED = 0;
+-  ORDER_STATUS_PENDING = 1;
++  ORDER_STATUS_AWAITING_PAYMENT = 1;
+   ORDER_STATUS_PAID = 2;
+   ORDER_STATUS_SHIPPED = 3;
+   ORDER_STATUS_CANCELLED = 4;
+ }
+ 
++message Money {
++  int64 amount_minor = 1;  // minor units, e.g. 1999 = 19.99 USD
++  string currency = 2;     // ISO 4217, e.g. "USD"
++}
++
++message Customer {
++  string customer_id = 1;
++  string display_name = 2;
++}
++
+ message OrderSummary {
+   string order_id = 1;
+-  string customer_name = 2;
+-  double total_price = 3;  // major units (USD), e.g. 19.99
+   OrderStatus status = 4;
++  Customer customer = 5;
++  Money total = 6;
++  string shipping_eta = 7;  // RFC 3339 timestamp, empty when unknown
++  string customer_name = 2 [deprecated = true];
++  double total_price = 3 [deprecated = true];
+ }
+diff --git a/billing-service/tests/fixtures/order_v2_paid.json b/billing-service/tests/fixtures/order_v2_paid.json
+new file mode 100644
+index 0000000..7f2562a
+--- /dev/null
++++ b/billing-service/tests/fixtures/order_v2_paid.json
+@@ -0,0 +1,13 @@
++{
++  "order_id": "o-1001",
++  "customer": {
++    "customer_id": "c-1001",
++    "display_name": "Ada Lovelace"
++  },
++  "total": {
++    "amount_minor": 1999,
++    "currency": "USD"
++  },
++  "status": "PAID",
++  "created_at": "2026-09-01T10:00:00Z"
++}
+diff --git a/billing-service/tests/fixtures/order_v2_unpaid.json b/billing-service/tests/fixtures/order_v2_unpaid.json
+new file mode 100644
+index 0000000..7f6a9ed
+--- /dev/null
++++ b/billing-service/tests/fixtures/order_v2_unpaid.json
+@@ -0,0 +1,13 @@
++{
++  "order_id": "o-1002",
++  "customer": {
++    "customer_id": "c-1002",
++    "display_name": "Alan Turing"
++  },
++  "total": {
++    "amount_minor": 500,
++    "currency": "USD"
++  },
++  "status": "AWAITING_PAYMENT",
++  "created_at": "2026-09-02T11:00:00Z"
++}
+diff --git a/billing-service/tests/unit/test_invoice.py b/billing-service/tests/unit/test_invoice.py
+index 89e9649..0b71d8a 100644
+--- a/billing-service/tests/unit/test_invoice.py
++++ b/billing-service/tests/unit/test_invoice.py
+@@ -12,9 +12,6 @@ def _load(name: str) -> dict:
+     return json.loads((FIXTURES / name).read_text())
+ 
+ 
+-PAID = _load("order_paid.json")
+-UNPAID = _load("order_unpaid.json")
+-
+ EXPECTED = {
+     "order_id": "o-1001",
+     "customer": "Ada Lovelace",
+@@ -25,14 +22,18 @@ EXPECTED = {
+ }
+ 
+ 
+-def test_paid_fixture_invoice():
+-    assert invoice_from_order_payload(PAID) == EXPECTED
++@pytest.mark.parametrize("fixture_name", ["order_paid.json", "order_v2_paid.json"])
++def test_paid_fixture_invoice(fixture_name):
++    payload = _load(fixture_name)
++    assert invoice_from_order_payload(payload) == EXPECTED
+ 
+ 
+-def test_unpaid_fixture_returns_none():
+-    assert invoice_from_order_payload(UNPAID) is None
++@pytest.mark.parametrize("fixture_name", ["order_unpaid.json", "order_v2_unpaid.json"])
++def test_unpaid_fixture_returns_none(fixture_name):
++    payload = _load(fixture_name)
++    assert invoice_from_order_payload(payload) is None
+ 
+ 
+ def test_cancelled_returns_none():
+-    payload = dict(PAID, status="CANCELLED")
++    payload = dict(_load("order_paid.json"), status="CANCELLED")
+     assert invoice_from_order_payload(payload) is None
+diff --git a/billing-service/tests/unit/test_payments.py b/billing-service/tests/unit/test_payments.py
+index 977b327..d8362aa 100644
+--- a/billing-service/tests/unit/test_payments.py
++++ b/billing-service/tests/unit/test_payments.py
+@@ -4,7 +4,7 @@ from billing.clients.gen import orders_pb2
+ from billing.services.payments import status_from_summary
+ 
+ 
+-def test_paid_order_summary():
++def test_paid_order_summary_v1():
+     summary = orders_pb2.OrderSummary(
+         order_id="o-1001",
+         customer_name="Ada Lovelace",
+@@ -18,3 +18,19 @@ def test_paid_order_summary():
+         "amount_minor": 1999,
+         "currency": "USD",
+     }
++
++
++def test_paid_order_summary_v2():
++    summary = orders_pb2.OrderSummary(
++        order_id="o-1001",
++        customer=orders_pb2.Customer(customer_id="c-1001", display_name="Ada Lovelace"),
++        total=orders_pb2.Money(amount_minor=1999, currency="USD"),
++        status=orders_pb2.ORDER_STATUS_PAID,
++    )
++    result = status_from_summary(summary)
++    assert result == {
++        "order_id": "o-1001",
++        "paid": True,
++        "amount_minor": 1999,
++        "currency": "USD",
++    }
+diff --git a/billing-service/tests/unit/test_revenue.py b/billing-service/tests/unit/test_revenue.py
+index 8de13ea..7277d83 100644
+--- a/billing-service/tests/unit/test_revenue.py
++++ b/billing-service/tests/unit/test_revenue.py
+@@ -6,11 +6,18 @@ from sqlalchemy import create_engine, text
+ 
+ from billing.reports.revenue import run_revenue_report
+ 
+-ROWS = [
+-    ("o-1001", "Ada Lovelace",    19.99, "PAID",      "2026-09-01 10:00:00"),
+-    ("o-1002", "Alan Turing",      5.0,  "PENDING",   "2026-09-02 11:00:00"),
+-    ("o-1003", "Grace Hopper",   120.5,  "SHIPPED",   "2026-09-03 12:00:00"),
+-    ("o-1004", "Edsger Dijkstra", 42.0,  "CANCELLED", "2026-09-04 13:00:00"),
++ROWS_V1 = [
++    ("o-1001", "Ada Lovelace", 19.99, "PAID", "2026-09-01 10:00:00"),
++    ("o-1002", "Alan Turing", 5.0, "PENDING", "2026-09-02 11:00:00"),
++    ("o-1003", "Grace Hopper", 120.5, "SHIPPED", "2026-09-03 12:00:00"),
++    ("o-1004", "Edsger Dijkstra", 42.0, "CANCELLED", "2026-09-04 13:00:00"),
++]
++
++ROWS_V2 = [
++    ("o-1001", "Ada Lovelace", 1999, "PAID", "2026-09-01 10:00:00"),
++    ("o-1002", "Alan Turing", 500, "AWAITING_PAYMENT", "2026-09-02 11:00:00"),
++    ("o-1003", "Grace Hopper", 12050, "SHIPPED", "2026-09-03 12:00:00"),
++    ("o-1004", "Edsger Dijkstra", 4200, "CANCELLED", "2026-09-04 13:00:00"),
+ ]
+ 
+ EXPECTED = [
+@@ -25,7 +32,8 @@ def db_url(tmp_path):
+     url = f"sqlite:///{db_file}"
+     engine = create_engine(url)
+     with engine.connect() as conn:
+-        conn.execute(text("""
++        conn.execute(
++            text("""
+             CREATE TABLE orders (
+                 order_id TEXT,
+                 customer_name TEXT,
+@@ -33,8 +41,44 @@ def db_url(tmp_path):
+                 status TEXT,
+                 created_at TEXT
+             )
+-        """))
+-        for row in ROWS:
++        """)
++        )
++        for row in ROWS_V1:
++            conn.execute(
++                text("INSERT INTO orders VALUES (:a, :b, :c, :d, :e)"),
++                {"a": row[0], "b": row[1], "c": row[2], "d": row[3], "e": row[4]},
++            )
++        conn.commit()
++    engine.dispose()
++    return url
++
++
++@pytest.fixture
++def db_url_v2(tmp_path):
++    db_file = tmp_path / "test_orders_v2.db"
++    url = f"sqlite:///{db_file}"
++    engine = create_engine(url)
++    with engine.connect() as conn:
++        conn.execute(
++            text("""
++            CREATE TABLE alembic_version (
++                version_num VARCHAR(32) PRIMARY KEY
++            )
++        """)
++        )
++        conn.execute(text("INSERT INTO alembic_version VALUES ('0002')"))
++        conn.execute(
++            text("""
++            CREATE TABLE orders (
++                order_id TEXT,
++                customer_display_name TEXT,
++                total_minor INTEGER,
++                status TEXT,
++                created_at TEXT
++            )
++        """)
++        )
++        for row in ROWS_V2:
+             conn.execute(
+                 text("INSERT INTO orders VALUES (:a, :b, :c, :d, :e)"),
+                 {"a": row[0], "b": row[1], "c": row[2], "d": row[3], "e": row[4]},
+@@ -47,3 +91,8 @@ def db_url(tmp_path):
+ def test_revenue_report(db_url):
+     result = run_revenue_report(db_url)
+     assert result == EXPECTED
++
++
++def test_revenue_report_v2(db_url_v2):
++    result = run_revenue_report(db_url_v2)
++    assert result == EXPECTED

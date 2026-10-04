@@ -1,0 +1,8 @@
+{
+  "run_id": "w-20261004-203249-a4d2",
+  "verdict": "green",
+  "reasons": [
+    "All deterministic verification checks V1-V6 passed."
+  ],
+  "fix_instructions": []
+}
