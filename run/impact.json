@@ -1,0 +1,256 @@
+{
+  "run_id": "w-20261027-155558-7c9a",
+  "mapping": [
+    {
+      "change_ids": ["CH1"],
+      "old": "total_price",
+      "new": "total",
+      "rule": "property_removed"
+    },
+    {
+      "change_ids": ["CH2"],
+      "old": "customer_name",
+      "new": "customer",
+      "rule": "property_removed"
+    },
+    {
+      "change_ids": ["CH3"],
+      "old": "PENDING",
+      "new": "AWAITING_PAYMENT",
+      "rule": "enum_value_renamed"
+    }
+  ],
+  "affected": [
+    {
+      "file": "billing/models/order.py",
+      "line": 7,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update OrderDTO to accept customer object with display_name, falling back to customer_name."
+    },
+    {
+      "file": "billing/models/order.py",
+      "line": 8,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Update OrderDTO to accept total object with amount_minor, falling back to total_price."
+    },
+    {
+      "file": "billing/reports/revenue.sql",
+      "line": 1,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "db",
+      "failure": "loud",
+      "endpoint": "GET /reports/revenue",
+      "fix": "Update SQL query to handle 0002 schema with total_minor column."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 4,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "rest",
+      "failure": "silent",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Add AWAITING_PAYMENT to NOT_PAYABLE status set."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 15,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Read total.amount_minor if present, else convert total_price."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 16,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Calculate tax from amount_minor."
+    },
+    {
+      "file": "billing/services/invoice.py",
+      "line": 21,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "rest",
+      "failure": "loud",
+      "endpoint": "POST /invoices/{order_id}",
+      "fix": "Extract customer display_name."
+    },
+    {
+      "file": "billing/services/payments.py",
+      "line": 14,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "grpc",
+      "failure": "silent",
+      "endpoint": "GET /payments/{order_id}/status",
+      "fix": "Read summary.total.amount_minor if present, falling back to summary.total_price."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 18,
+      "symbol": "ORDER_STATUS_PENDING",
+      "change_ids": ["CH3"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update vendored proto definitions."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 26,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Mark customer_name as deprecated in proto."
+    },
+    {
+      "file": "contracts/upstream/orders.proto",
+      "line": 27,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "grpc",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Mark total_price as deprecated in proto."
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 3,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture JSON to v2 payload format."
+    },
+    {
+      "file": "tests/fixtures/order_paid.json",
+      "line": 4,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture JSON to v2 payload format."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 3,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture JSON to v2 payload format."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 4,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update fixture JSON to v2 payload format."
+    },
+    {
+      "file": "tests/fixtures/order_unpaid.json",
+      "line": 5,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update unpaid status to AWAITING_PAYMENT in test fixture."
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 10,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update unit test mock summary object."
+    },
+    {
+      "file": "tests/unit/test_payments.py",
+      "line": 11,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update unit test mock summary object."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 11,
+      "symbol": "PENDING",
+      "change_ids": ["CH3"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test status values to AWAITING_PAYMENT."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "customer_name",
+      "change_ids": ["CH2"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test database schema."
+    },
+    {
+      "file": "tests/unit/test_revenue.py",
+      "line": 28,
+      "symbol": "total_price",
+      "change_ids": ["CH1"],
+      "surface": "test",
+      "failure": "none",
+      "endpoint": null,
+      "fix": "Update test database schema."
+    }
+  ],
+  "endpoints": [
+    {
+      "endpoint": "POST /invoices/{order_id}",
+      "surface": "rest",
+      "failure": "loud",
+      "why": "OrderDTO validation fails when customer_name and total_price are missing in v2 REST payload; additionally, NOT_PAYABLE status set misses AWAITING_PAYMENT."
+    },
+    {
+      "endpoint": "GET /payments/{order_id}/status",
+      "surface": "grpc",
+      "failure": "silent",
+      "why": "gRPC OrderSummary removed total_price field; proto3 defaults missing fields to 0.0, resulting in amount_minor silently calculating as 0."
+    },
+    {
+      "endpoint": "GET /reports/revenue",
+      "surface": "db",
+      "failure": "loud",
+      "why": "revenue.sql selects orders.total_price column which was dropped in migration 0002_money_customer_status."
+    }
+  ],
+  "migration_notes": "RFC-042 details Orders API v2 breaking changes affecting REST, gRPC, and DB schema. Consumer migration guidance requires billing-service to implement tolerant readers that support both v1 and v2 formats simultaneously before orders-service deploys migration 0002_money_customer_status. For REST, read total.amount_minor when present, else round(total_price * 100), read customer.display_name when present, else customer_name, and treat both PENDING and AWAITING_PAYMENT as not payable. For gRPC, vendor v2 proto with fields 2 and 3 re-declared as deprecated to inspect HasField. For SQL, inspect alembic_version to branch between SUM(total_price) for 0001 and SUM(total_minor) for 0002."
+}
